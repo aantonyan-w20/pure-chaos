@@ -1,13 +1,15 @@
 --[[
 	Board
 	The physical 3x3 board on a table top: nine clickable cells, the
-	grid walls between them, and the X/O marks drawn on cells.
-	Holds no game rules — Logic owns those.
+	grid walls between them, and the X/O marks drawn on cells (styled
+	by the placing player's equipped skin). Holds no game rules —
+	Logic owns those.
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local Skins = require(ReplicatedStorage.Shared.Skins)
 local PartBuilder = require(script.Parent.Parent.World.PartBuilder)
 
 local Board = {}
@@ -72,7 +74,7 @@ function Board:connectCellClicks(callback: (number, Player) -> ())
 	end
 end
 
-function Board:drawMark(cellNumber: number, symbol: string)
+function Board:drawMark(cellNumber: number, symbol: string, skinId: string?)
 	local cell = self.cells[cellNumber]
 
 	local gui = Instance.new("SurfaceGui")
@@ -82,14 +84,10 @@ function Board:drawMark(cellNumber: number, symbol: string)
 	gui.CanvasSize = Vector2.new(100, 100)
 	gui.Parent = cell
 
+	-- parent first: skin animations stop when the label leaves the tree
 	local label = Instance.new("TextLabel")
-	label.Size = UDim2.new(1, 0, 1, 0)
-	label.BackgroundTransparency = 1
-	label.Font = Enum.Font.GothamBold
-	label.TextScaled = true
-	label.Text = symbol
-	label.TextColor3 = (symbol == "X") and Config.Colors.X or Config.Colors.O
 	label.Parent = gui
+	Skins.apply(label, skinId or "Classic", symbol)
 end
 
 function Board:highlightLine(line: { number }, color: Color3)

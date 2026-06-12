@@ -35,6 +35,18 @@ Config.HubPortalPosition = Vector3.new(15, 0, 15)
 -- The RemoteEvent name the server and client camera agree on
 Config.MatchEventName = "TableMatchEvent"
 
+-- Economy
+Config.TacsPerWin = 15
+Config.ProRollGamepassId = 0 -- paste the real gamepass id from the Creator Hub here
+Config.ProRollRobuxPrice = 39 -- display only; the actual price is set on the Creator Hub
+
+Config.EconomyRemotes = {
+	ProfileUpdated = "ProfileUpdated",
+	GetProfile = "GetProfile",
+	EquipSkin = "EquipSkin",
+	RequestRoll = "RequestRoll",
+}
+
 Config.Colors = {
 	X = Color3.fromRGB(226, 75, 74),
 	O = Color3.fromRGB(55, 138, 221),
