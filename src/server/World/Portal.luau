@@ -42,6 +42,32 @@ local function buildArch(parent: Instance, baseCFrame: CFrame, radius: number, p
 	end
 end
 
+-- A floating text sign hovering above the arch
+local function buildSign(parent: Instance, baseCFrame: CFrame, archTop: number, text: string)
+	local signPart = PartBuilder.make(parent, {
+		Name = "PortalSign",
+		Size = Vector3.new(1, 1, 1),
+		CFrame = baseCFrame * CFrame.new(0, archTop + 1.5, 0),
+		Transparency = 1,
+		CanCollide = false,
+	})
+
+	local billboard = Instance.new("BillboardGui")
+	billboard.Size = UDim2.new(0, 320, 0, 60)
+	billboard.MaxDistance = 80
+	billboard.Parent = signPart
+
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.TextScaled = true
+	label.Font = Enum.Font.GothamBold
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.TextStrokeTransparency = 0.5
+	label.Text = text
+	label.Parent = billboard
+end
+
 local function teleportOnTouch(glow: Part, destinationCFrame: CFrame)
 	glow.Touched:Connect(function(hit)
 		local character = hit.Parent
@@ -62,7 +88,8 @@ function Portal.build(
 	basePos: Vector3,
 	faceTarget: Vector3,
 	destinationCFrame: CFrame,
-	glowColor: Color3
+	glowColor: Color3,
+	labelText: string?
 )
 	local baseCFrame = CFrame.lookAt(
 		Vector3.new(basePos.X, Config.IslandTop, basePos.Z),
@@ -72,6 +99,9 @@ function Portal.build(
 	local pillarHeight = 5
 
 	buildArch(parent, baseCFrame, radius, pillarHeight)
+	if labelText then
+		buildSign(parent, baseCFrame, pillarHeight + radius, labelText)
+	end
 
 	local glow = PartBuilder.make(parent, {
 		Name = "PortalGlow",

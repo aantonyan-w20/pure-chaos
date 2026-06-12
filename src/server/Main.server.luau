@@ -40,7 +40,8 @@ end
 local function buildHub()
 	Island.build(worldFolder, 0, 0, Config.HubDiameter)
 	makeSpawnPad()
-	Scenery.decorate(worldFolder, 0, 0, Config.HubDiameter, 14)
+	-- keep-clear: no trees/rocks blocking the portal to the mystery island
+	Scenery.decorate(worldFolder, 0, 0, Config.HubDiameter, 14, { Config.HubPortalPosition })
 end
 
 local function buildGameIslands()
@@ -67,24 +68,32 @@ local function buildMysteryIsland()
 	local mystery = Config.MysteryIslandPosition
 	Island.build(worldFolder, mystery.X, mystery.Z, Config.GameIslandDiameter)
 	GameTable.create(worldFolder, mystery.X, mystery.Z, true, matchEvent)
-	Scenery.decorate(worldFolder, mystery.X, mystery.Z, Config.GameIslandDiameter, 8)
+	Scenery.decorate(
+		worldFolder,
+		mystery.X,
+		mystery.Z,
+		Config.GameIslandDiameter,
+		8,
+		{ Config.MysteryPortalPosition }
+	)
 
 	-- Hub -> mystery island
 	Portal.build(
 		worldFolder,
-		Vector3.new(15, 0, 15),
+		Config.HubPortalPosition,
 		Vector3.new(0, 0, 0),
 		CFrame.lookAt(
 			Vector3.new(mystery.X - 7, Config.IslandTop + 4, mystery.Z - 7),
 			Vector3.new(mystery.X, Config.IslandTop + 4, mystery.Z)
 		),
-		Color3.fromRGB(125, 90, 255)
+		Color3.fromRGB(125, 90, 255),
+		"Avoid 3 in a row"
 	)
 
 	-- Mystery island -> back to the hub
 	Portal.build(
 		worldFolder,
-		Vector3.new(mystery.X - 13, 0, mystery.Z - 13),
+		Config.MysteryPortalPosition,
 		mystery,
 		CFrame.lookAt(
 			Vector3.new(8, Config.IslandTop + 4, 8),

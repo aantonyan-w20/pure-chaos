@@ -29,6 +29,9 @@ Config.MysteryIslandPosition = Vector3.new(300, 0, 300)
 -- Fixed seed so the park's trees and rocks land in the same spots every server
 Config.SceneSeed = 7
 
+-- Portal locations (the mystery one is derived below)
+Config.HubPortalPosition = Vector3.new(15, 0, 15)
+
 -- The RemoteEvent name the server and client camera agree on
 Config.MatchEventName = "TableMatchEvent"
 
@@ -52,5 +55,6 @@ Config.Colors = {
 Config.CellStep = Config.CellSize + Config.CellGap
 Config.BoardLength = 3 * Config.CellSize + 4 * Config.CellGap
 Config.TableTopY = Config.IslandTop + 3
+Config.MysteryPortalPosition = Config.MysteryIslandPosition + Vector3.new(-13, 0, -13)
 
 return Config

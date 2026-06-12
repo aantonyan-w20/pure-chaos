@@ -11,7 +11,10 @@ local PartBuilder = require(script.Parent.PartBuilder)
 local Bridge = {}
 
 function Bridge.build(parent: Instance, fromPos: Vector3, toPos: Vector3)
-	local deckY = Config.IslandTop - 0.5
+	-- The deck top sits 0.05 studs above the grass: if the two surfaces are
+	-- at exactly the same height, they flicker (z-fight) where they overlap
+	-- at the island edge.
+	local deckY = Config.IslandTop - 0.45
 	local distance = (toPos - fromPos).Magnitude
 	local midpoint = (fromPos + toPos) / 2
 	local deckCFrame = CFrame.lookAt(

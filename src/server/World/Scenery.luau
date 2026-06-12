@@ -94,9 +94,26 @@ local function makeFlower(parent: Instance, x: number, z: number)
 	})
 end
 
+local KEEP_CLEAR_RADIUS = 8
+
+local function isTooCloseToKeepClear(x: number, z: number, keepClear: { Vector3 }?): boolean
+	if not keepClear then
+		return false
+	end
+	for _, point in ipairs(keepClear) do
+		local dx = x - point.X
+		local dz = z - point.Z
+		if math.sqrt(dx * dx + dz * dz) < KEEP_CLEAR_RADIUS then
+			return true
+		end
+	end
+	return false
+end
+
 -- Scatters `count` decorations in a ring around (cx, cz), keeping the
--- island center clear for tables and spawn pads.
-function Scenery.decorate(parent: Instance, cx: number, cz: number, diameter: number, count: number)
+-- island center clear for tables and spawn pads. Positions in `keepClear`
+-- (e.g. portals) get an 8-stud no-decoration zone around them.
+function Scenery.decorate(parent: Instance, cx: number, cz: number, diameter: number, count: number, keepClear: { Vector3 }?)
 	local placed = 0
 	local attempts = 0
 	while placed < count and attempts < 200 do
@@ -105,7 +122,7 @@ function Scenery.decorate(parent: Instance, cx: number, cz: number, diameter: nu
 		local radius = rng:NextNumber(diameter * 0.26, diameter * 0.42)
 		local x = cx + math.cos(angle) * radius
 		local z = cz + math.sin(angle) * radius
-		if math.abs(x - cx) > 5 and math.abs(z - cz) > 5 then
+		if math.abs(x - cx) > 5 and math.abs(z - cz) > 5 and not isTooCloseToKeepClear(x, z, keepClear) then
 			local roll = rng:NextInteger(1, 10)
 			if roll <= 4 then
 				makeTree(parent, x, z)
