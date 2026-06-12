@@ -1,7 +1,9 @@
 --[[
 	GameTable
 	One complete playable tic-tac-toe table: builds the furniture and
-	board, then wires player clicks through the rules in Logic.
+	board, then wires player clicks through the rules in Logic. Marks
+	are drawn in the placing player's equipped skin, and the winner
+	earns Tacs through the economy interface.
 
 	House rules enforced (silently — an invalid click just does nothing):
 	  1. Both chairs must be occupied before anyone can place a mark.
@@ -12,6 +14,7 @@
 	three in a row LOSES (the line is highlighted red instead of green).
 ]]
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
@@ -24,7 +27,19 @@ local GameTable = {}
 
 local RESET_DELAY = 4 -- seconds the final board stays visible
 
-function GameTable.create(parent: Instance, cx: number, cz: number, misere: boolean, matchEvent: RemoteEvent)
+export type Economy = {
+	awardWin: (Player) -> (),
+	equippedSkin: (Player) -> string,
+}
+
+function GameTable.create(
+	parent: Instance,
+	cx: number,
+	cz: number,
+	misere: boolean,
+	matchEvent: RemoteEvent,
+	economy: Economy
+)
 	local xSeat, oSeat = Furniture.build(parent, cx, cz)
 	local board = Board.new(parent, cx, cz)
 	local logic = Logic.new()
@@ -49,6 +64,20 @@ function GameTable.create(parent: Instance, cx: number, cz: number, misere: bool
 		return nil
 	end
 
+	local function awardWinner(result: string)
+		local winnerSymbol = result
+		if misere then
+			-- making three in a row LOSES, so the other player won
+			winnerSymbol = (result == "X") and "O" or "X"
+		end
+		local seat = (winnerSymbol == "X") and xSeat or oSeat
+		local humanoid = seat.Occupant
+		local player = humanoid and Players:GetPlayerFromCharacter(humanoid.Parent)
+		if player then
+			economy.awardWin(player)
+		end
+	end
+
 	local function resetAfterDelay()
 		task.wait(RESET_DELAY)
 		board:clear()
@@ -57,9 +86,11 @@ function GameTable.create(parent: Instance, cx: number, cz: number, misere: bool
 
 	local function finishGame(result: string, line: { number }?)
 		if line then
-			-- In misere, making three in a row LOSES, so the line shows red
 			local color = misere and Config.Colors.LoseCell or Config.Colors.WinCell
 			board:highlightLine(line, color)
+		end
+		if result ~= "TIE" then
+			awardWinner(result)
 		end
 		task.spawn(resetAfterDelay)
 	end
@@ -80,7 +111,7 @@ function GameTable.create(parent: Instance, cx: number, cz: number, misere: bool
 			return
 		end
 
-		board:drawMark(cellNumber, symbol)
+		board:drawMark(cellNumber, symbol, economy.equippedSkin(player))
 		local result, line = logic:place(cellNumber, symbol)
 		if result then
 			finishGame(result, line)

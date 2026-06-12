@@ -14,6 +14,7 @@ local Environment = require(script.Parent.World.Environment)
 local Island = require(script.Parent.World.Island)
 local Portal = require(script.Parent.World.Portal)
 local Scenery = require(script.Parent.World.Scenery)
+local EconomyServer = require(script.Parent.Economy.EconomyServer)
 local GameTable = require(script.Parent.TicTacToe.GameTable)
 
 -- The "walkie-talkie" the server uses to tell each player's camera
@@ -21,6 +22,9 @@ local GameTable = require(script.Parent.TicTacToe.GameTable)
 local matchEvent = Instance.new("RemoteEvent")
 matchEvent.Name = Config.MatchEventName
 matchEvent.Parent = ReplicatedStorage
+
+-- Tacs, skins, and rolls: profiles, remotes, and the win-reward hook
+local economy = EconomyServer.start()
 
 local worldFolder = Instance.new("Folder")
 worldFolder.Name = "TicTacToePark"
@@ -46,7 +50,7 @@ end
 
 local function buildIslandWithTable(cx: number, cz: number)
 	Island.build(worldFolder, cx, cz, Config.GameIslandDiameter)
-	GameTable.create(worldFolder, cx, cz, false, matchEvent)
+	GameTable.create(worldFolder, cx, cz, false, matchEvent, economy)
 	Scenery.decorate(worldFolder, cx, cz, Config.GameIslandDiameter, 8)
 end
 
@@ -94,7 +98,7 @@ end
 local function buildMysteryIsland()
 	local mystery = Config.MysteryIslandPosition
 	Island.build(worldFolder, mystery.X, mystery.Z, Config.GameIslandDiameter)
-	GameTable.create(worldFolder, mystery.X, mystery.Z, true, matchEvent)
+	GameTable.create(worldFolder, mystery.X, mystery.Z, true, matchEvent, economy)
 	Scenery.decorate(
 		worldFolder,
 		mystery.X,
