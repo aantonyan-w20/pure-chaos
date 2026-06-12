@@ -1,4 +1,4 @@
-# Our Roblox Game
+# Pure Chaos
 
 A Roblox game built by two friends, managed with [Rojo](https://rojo.space/) so all
 game code lives in this repository instead of being locked inside Roblox Studio.
