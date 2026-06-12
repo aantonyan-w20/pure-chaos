@@ -1,0 +1,15 @@
+# Roblox place/model build artifacts — built locally, never committed
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+*.rbxl.lock
+*.rbxlx.lock
+
+# Roblox Studio autosaves
+*.rbxlx-auto
+sourcemap.json
+
+# OS noise
+.DS_Store
+Thumbs.db

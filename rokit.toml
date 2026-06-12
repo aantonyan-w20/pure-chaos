@@ -1,0 +1,6 @@
+# Toolchain manifest for Rokit (https://github.com/rojo-rbx/rokit).
+# Anyone cloning this repo can run `rokit install` to get the exact
+# same tool versions. On macOS you can alternatively `brew install rojo`.
+
+[tools]
+rojo = "rojo-rbx/rojo@7.6.1"
