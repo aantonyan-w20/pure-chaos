@@ -1,8 +1,8 @@
 --[[
 	Board
 	The physical 3x3 board on a table top: nine clickable cells, the
-	grid walls between them, the floating status sign, and the X/O
-	marks drawn on cells. Holds no game rules — Logic owns those.
+	grid walls between them, and the X/O marks drawn on cells.
+	Holds no game rules — Logic owns those.
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -55,36 +55,9 @@ local function buildGridWalls(parent: Instance, cx: number, cz: number)
 	end
 end
 
--- Floating status sign, off-center so the top-down camera sees the board
-local function buildStatusSign(parent: Instance, cx: number, cz: number): TextLabel
-	local signPart = PartBuilder.make(parent, {
-		Name = "StatusSign",
-		Size = Vector3.new(1, 1, 1),
-		Position = Vector3.new(cx, Config.TableTopY + 3.5, cz + 4),
-		Transparency = 1,
-		CanCollide = false,
-	})
-
-	local billboard = Instance.new("BillboardGui")
-	billboard.Size = UDim2.new(0, 240, 0, 48)
-	billboard.AlwaysOnTop = true
-	billboard.Parent = signPart
-
-	local statusLabel = Instance.new("TextLabel")
-	statusLabel.Size = UDim2.new(1, 0, 1, 0)
-	statusLabel.BackgroundTransparency = 1
-	statusLabel.TextScaled = true
-	statusLabel.Font = Enum.Font.GothamBold
-	statusLabel.TextColor3 = Color3.new(1, 1, 1)
-	statusLabel.TextStrokeTransparency = 0.5
-	statusLabel.Parent = billboard
-	return statusLabel
-end
-
 function Board.new(parent: Instance, cx: number, cz: number)
 	local self = setmetatable({}, Board)
 	self.cells = buildCells(parent, cx, cz)
-	self.statusLabel = buildStatusSign(parent, cx, cz)
 	buildGridWalls(parent, cx, cz)
 	return self
 end
@@ -97,10 +70,6 @@ function Board:connectCellClicks(callback: (number, Player) -> ())
 			callback(i, player)
 		end)
 	end
-end
-
-function Board:setStatus(text: string)
-	self.statusLabel.Text = text
 end
 
 function Board:drawMark(cellNumber: number, symbol: string)

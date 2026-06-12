@@ -44,6 +44,12 @@ local function buildHub()
 	Scenery.decorate(worldFolder, 0, 0, Config.HubDiameter, 14, { Config.HubPortalPosition })
 end
 
+local function buildIslandWithTable(cx: number, cz: number)
+	Island.build(worldFolder, cx, cz, Config.GameIslandDiameter)
+	GameTable.create(worldFolder, cx, cz, false, matchEvent)
+	Scenery.decorate(worldFolder, cx, cz, Config.GameIslandDiameter, 8)
+end
+
 local function buildGameIslands()
 	local islandSpots = {
 		Vector3.new(Config.IslandDistance, 0, 0),
@@ -53,14 +59,35 @@ local function buildGameIslands()
 	}
 
 	for _, spot in ipairs(islandSpots) do
-		Island.build(worldFolder, spot.X, spot.Z, Config.GameIslandDiameter)
-		GameTable.create(worldFolder, spot.X, spot.Z, false, matchEvent)
-		Scenery.decorate(worldFolder, spot.X, spot.Z, Config.GameIslandDiameter, 8)
+		buildIslandWithTable(spot.X, spot.Z)
 
 		local direction = Vector3.new(spot.X, 0, spot.Z).Unit
 		local bridgeStart = direction * (Config.HubDiameter / 2 - 1)
 		local bridgeEnd = direction * (Config.IslandDistance - Config.GameIslandDiameter / 2 + 1)
-		Bridge.build(worldFolder, bridgeStart, bridgeEnd)
+		-- railing opening in the middle, where the cross bridge joins
+		Bridge.build(worldFolder, bridgeStart, bridgeEnd, { railGaps = { 0 } })
+
+		-- A cross bridge through this bridge's midpoint, running sideways
+		-- to two extra islands that line up with the neighboring islands.
+		local junction = (bridgeStart + bridgeEnd) / 2
+		local sideways = Vector3.new(-direction.Z, 0, direction.X)
+		local reach = bridgeEnd.Magnitude
+
+		-- The four cross bridges meet each other at the four corners.
+		-- Crossing decks must not share the same height (they'd flicker),
+		-- so Z-running decks sit 0.1 low and X-running decks 0.2 low.
+		-- Railing openings: the main-bridge junction (0) and both corners.
+		local corner = junction.Magnitude
+		Bridge.build(worldFolder, junction - sideways * reach, junction + sideways * reach, {
+			yOffset = (direction.X ~= 0) and -0.1 or -0.2,
+			railGaps = { -corner, 0, corner },
+		})
+
+		-- The two new tic-tac-toe islands at the ends of the cross bridge
+		for _, side in ipairs({ -1, 1 }) do
+			local center = junction + sideways * side * Config.IslandDistance
+			buildIslandWithTable(center.X, center.Z)
+		end
 	end
 end
 
