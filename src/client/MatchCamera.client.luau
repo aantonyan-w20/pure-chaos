@@ -15,7 +15,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
-local VsBanner = require(script.Parent.VsBanner)
+local Banner = require(script.Parent.Banner)
 
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
@@ -30,7 +30,7 @@ local matchActive = false
 
 local function releaseCamera()
 	matchActive = false
-	VsBanner.hide()
+	Banner.hide()
 	camera.CameraType = Enum.CameraType.Custom
 end
 
@@ -56,7 +56,7 @@ local function startMatch(info: { [string]: any })
 	camera.CFrame = CFrame.lookAt(boardCenter + Vector3.new(10, 4, 0), boardCenter)
 
 	-- 2) the big VS banner: X player's username vs O player's username
-	VsBanner.show(info.xName, info.oName)
+	Banner.showVersus(info.xName, info.oName)
 
 	-- 3) glide up to a straight-down view of the board
 	task.delay(GLIDE_DELAY, function()
@@ -69,6 +69,9 @@ end
 matchEvent.OnClientEvent:Connect(function(action, info)
 	if action == "start" then
 		startMatch(info)
+	elseif action == "banner" then
+		-- round / tie / match-winner text (info is the message string)
+		Banner.showCenter(info)
 	elseif action == "stop" then
 		releaseCamera()
 	end

@@ -23,6 +23,9 @@ Config.BridgeWidth = 6
 -- Furniture
 Config.TableSize = 6
 
+-- Matches are best of three: first player to this many round wins takes it
+Config.WinsNeededForMatch = 2
+
 -- The far-away island with the misere table (3 in a row LOSES there)
 Config.MysteryIslandPosition = Vector3.new(300, 0, 300)
 

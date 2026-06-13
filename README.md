@@ -3,9 +3,13 @@
 A Roblox game built by two friends. Floating islands in the sky, connected by
 wooden bridges, each with a tic-tac-toe table. Sit in the **red chair** to play
 X, the **blue chair** to play O — when both chairs fill up, the cameras cut to
-a cinematic "you VS them" intro and lock to a top-down view of the board. A
-hidden portal leads to a mystery island where the rules flip: making three in
-a row **loses** (misère tic-tac-toe).
+a cinematic "you VS them" intro and lock to a top-down view of the board.
+
+Each match is **best of three**: "Round 1", "Round 2", "Round 3" are announced
+as you go, and the first to win two rounds takes the match. The loser is sent
+back to spawn and the winner hops up out of their seat. A hidden portal leads
+to a mystery island where the rules flip: making three in a row **loses** the
+round (misère tic-tac-toe).
 
 Winning a game earns **15 Tacs**, the in-game currency (shown bottom-left).
 Spend Tacs on **skin rolls** — randomized X/O skins like Rainbow, Cursive, or
@@ -33,14 +37,15 @@ src/
       RollService.luau       validates rolls, throws the weighted dice
       EconomyServer.luau     creates the economy remotes, win rewards
     TicTacToe/
-      Logic.luau             pure game rules (no Roblox instances)
+      Logic.luau             pure rules for one round (no Roblox instances)
+      Match.luau             pure best-of-three scorekeeping
       Board.luau             the physical clickable 3x3 board + skinned marks
       Furniture.luau         table + the assigned X/O chairs
-      MatchWatcher.luau      fires the match start/stop event to players
-      GameTable.luau         glues all of the above into one playable table
+      MatchWatcher.luau      reports when both chairs fill / a player leaves
+      GameTable.luau         runs the best-of-three match: rounds, win/lose
   client/
     MatchCamera.client.luau  cinematic camera when a match starts
-    VsBanner.luau            the "name VS name" banner
+    Banner.luau              VS header + "Round N" / result announcements
     Hud.client.luau          Tacs counter, Inventory and Rolls buttons
     Ui/                      TacsBox, InventoryPanel, RollShop, Widgets
 default.project.json         Rojo mapping: which folder goes where in the game

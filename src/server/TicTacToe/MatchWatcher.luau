@@ -1,14 +1,19 @@
 --[[
 	MatchWatcher
-	Watches a table's two chairs. The moment BOTH are occupied it
-	tells both players' camera scripts "the match started" (side view,
-	VS banner, glide to top-down). When either player stands up or
-	leaves, it releases both cameras.
+	Watches a table's two chairs and reports the transitions GameTable
+	cares about: onBothSeated (the moment both chairs fill) and
+	onVacated (a player stands up or leaves while seated). It only
+	reports — GameTable decides what a match start or a walkout means.
 ]]
 
 local Players = game:GetService("Players")
 
 local MatchWatcher = {}
+
+export type Handlers = {
+	onBothSeated: (Player, Player) -> (),
+	onVacated: () -> (),
+}
 
 local function playerInSeat(seat: Seat): Player?
 	local occupant = seat.Occupant -- the sitting character's Humanoid
@@ -18,33 +23,19 @@ local function playerInSeat(seat: Seat): Player?
 	return nil
 end
 
-function MatchWatcher.watch(xSeat: Seat, oSeat: Seat, matchEvent: RemoteEvent, tableInfo: { [string]: any })
-	local matchPlayers = nil
+function MatchWatcher.watch(xSeat: Seat, oSeat: Seat, handlers: Handlers)
+	local bothSeated = false
 
 	local function onOccupantChanged()
 		local xPlayer = playerInSeat(xSeat)
 		local oPlayer = playerInSeat(oSeat)
 
-		if xPlayer and oPlayer and not matchPlayers then
-			-- both chairs just filled: the match begins!
-			matchPlayers = { xPlayer, oPlayer }
-			local info = {
-				tableX = tableInfo.tableX,
-				tableZ = tableInfo.tableZ,
-				boardY = tableInfo.boardY,
-				xName = xPlayer.Name,
-				oName = oPlayer.Name,
-			}
-			matchEvent:FireClient(xPlayer, "start", info)
-			matchEvent:FireClient(oPlayer, "start", info)
-		elseif matchPlayers and (not xPlayer or not oPlayer) then
-			-- someone stood up or left: release both cameras
-			for _, player in ipairs(matchPlayers) do
-				if player.Parent then
-					matchEvent:FireClient(player, "stop")
-				end
-			end
-			matchPlayers = nil
+		if xPlayer and oPlayer and not bothSeated then
+			bothSeated = true
+			handlers.onBothSeated(xPlayer, oPlayer)
+		elseif bothSeated and (not xPlayer or not oPlayer) then
+			bothSeated = false
+			handlers.onVacated()
 		end
 	end
 
