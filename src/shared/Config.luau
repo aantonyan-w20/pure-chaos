@@ -39,7 +39,10 @@ Config.HubPortalPosition = Vector3.new(15, 0, 15)
 Config.MatchEventName = "TableMatchEvent"
 
 -- Economy
-Config.TacsPerWin = 15
+Config.TacsPerWin = 20
+-- Each consecutive match win past the first adds this much (streak 2 = +5,
+-- streak 3 = +10, ...). A loss resets the streak.
+Config.WinStreakBonus = 5
 Config.ProRollGamepassId = 0 -- paste the real gamepass id from the Creator Hub here
 Config.ProRollRobuxPrice = 39 -- display only; the actual price is set on the Creator Hub
 

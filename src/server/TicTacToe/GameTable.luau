@@ -26,7 +26,8 @@ local GameTable = {}
 local RESET_DELAY = 4 -- seconds the finished board stays up before the next round
 
 export type Economy = {
-	awardWin: (Player) -> (),
+	awardWin: (Player) -> number,
+	recordLoss: (Player) -> (),
 	equippedSkin: (Player) -> string,
 }
 
@@ -91,11 +92,22 @@ function GameTable.create(
 		local winnerHumanoid = winnerSeat.Occupant
 		local loserHumanoid = loserSeat.Occupant
 		local winnerPlayer = seatPlayer(winnerSeat)
+		local loserPlayer = seatPlayer(loserSeat)
 
+		local winnerName = (winnerPlayer and winnerPlayer.Name) or winnerSymbol
 		if winnerPlayer then
-			economy.awardWin(winnerPlayer)
+			local streak = economy.awardWin(winnerPlayer)
+			if streak >= 2 then
+				announce(winnerName .. " wins! Winstreak " .. streak)
+			else
+				announce(winnerName .. " wins the match!")
+			end
+		else
+			announce(winnerName .. " wins the match!")
 		end
-		announce(((winnerPlayer and winnerPlayer.Name) or winnerSymbol) .. " wins the match!")
+		if loserPlayer then
+			economy.recordLoss(loserPlayer)
+		end
 
 		task.wait(RESET_DELAY)
 		fireBoth("stop")

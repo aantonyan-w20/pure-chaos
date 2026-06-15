@@ -11,6 +11,7 @@ local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Co
 local Rolls = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Rolls"))
 local Skins = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Skins"))
 local Widgets = require(script.Parent.Widgets)
+local RollReveal = require(script.Parent.RollReveal)
 
 local RollShop = {}
 
@@ -79,6 +80,8 @@ function RollShop.create(
 	local result = Widgets.label(panel, "", UDim2.new(1, -20, 0, 30), UDim2.new(0, 10, 1, -38))
 	result.TextColor3 = Color3.fromRGB(255, 225, 120)
 
+	local reveal = RollReveal.create(gui)
+
 	local rolling = false
 	local function doRoll(roll)
 		if rolling then
@@ -87,20 +90,21 @@ function RollShop.create(
 		rolling = true
 		result.Text = "Rolling..."
 		local ok, outcome = pcall(requestRoll, roll.id)
-		rolling = false
 
 		if not ok or type(outcome) ~= "table" then
 			result.Text = REASON_TEXT.BadRequest
+			rolling = false
 			return
 		end
 		if outcome.ok then
-			local skin = Skins.Catalog[outcome.skinId]
-			result.Text = ("You got: %s %s"):format(
-				skin and skin.name or outcome.skinId,
-				outcome.isNew and "— NEW!" or "(duplicate)"
-			)
+			result.Text = ""
+			-- the spinning reveal keeps `rolling` true until it finishes
+			reveal.play(roll, outcome.skinId, outcome.isNew, function()
+				rolling = false
+			end)
 		else
 			result.Text = REASON_TEXT[outcome.reason] or REASON_TEXT.BadRequest
+			rolling = false
 			if outcome.reason == "NeedGamepass" then
 				promptGamepass()
 			end

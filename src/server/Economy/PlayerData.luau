@@ -1,13 +1,16 @@
 --[[
 	PlayerData
-	Each player's profile: Tacs balance, owned X/O skins, and which
-	skin is equipped. Loads from a DataStore on join and saves on
+	Each player's profile: Tacs balance, owned X/O skins, equipped skin,
+	and current win streak. Loads from a DataStore on join and saves on
 	leave. If the store is unreachable (e.g. Studio without API access)
 	the session still works — it just won't save.
 ]]
 
 local DataStoreService = game:GetService("DataStoreService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Config = require(ReplicatedStorage.Shared.Config)
 
 local PlayerData = {}
 
@@ -42,6 +45,7 @@ local function load(player: Player)
 		tacs = 0,
 		ownedSet = { [DEFAULT_SKIN] = true },
 		equipped = DEFAULT_SKIN,
+		streak = 0, -- consecutive match wins; resets on a loss
 		canSave = false,
 	}
 	if store then
@@ -52,6 +56,7 @@ local function load(player: Player)
 			profile.canSave = true
 			if saved then
 				profile.tacs = saved.tacs or 0
+				profile.streak = saved.streak or 0
 				for _, skinId in ipairs(saved.owned or {}) do
 					profile.ownedSet[skinId] = true
 				end
@@ -74,6 +79,7 @@ local function save(player: Player)
 		tacs = profile.tacs,
 		owned = ownedList(profile),
 		equipped = profile.equipped,
+		streak = profile.streak,
 	})
 end
 
@@ -109,13 +115,40 @@ function PlayerData.snapshot(player: Player)
 	if not profile then
 		return nil
 	end
-	return { tacs = profile.tacs, equipped = profile.equipped, owned = ownedList(profile) }
+	return {
+		tacs = profile.tacs,
+		equipped = profile.equipped,
+		owned = ownedList(profile),
+		streak = profile.streak,
+	}
 end
 
 function PlayerData.addTacs(player: Player, amount: number)
 	local profile = profiles[player]
 	if profile then
 		profile.tacs += amount
+		notify(player)
+	end
+end
+
+-- Records a match win: extends the streak, pays the base reward plus
+-- the streak bonus, and returns the new streak length.
+function PlayerData.recordWin(player: Player): number
+	local profile = profiles[player]
+	if not profile then
+		return 0
+	end
+	profile.streak += 1
+	local bonus = math.max(0, profile.streak - 1) * Config.WinStreakBonus
+	profile.tacs += Config.TacsPerWin + bonus
+	notify(player)
+	return profile.streak
+end
+
+function PlayerData.recordLoss(player: Player)
+	local profile = profiles[player]
+	if profile and profile.streak ~= 0 then
+		profile.streak = 0
 		notify(player)
 	end
 end

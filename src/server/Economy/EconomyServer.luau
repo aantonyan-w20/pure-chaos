@@ -14,7 +14,8 @@ local RollService = require(script.Parent.RollService)
 local EconomyServer = {}
 
 export type Economy = {
-	awardWin: (Player) -> (),
+	awardWin: (Player) -> number, -- pays the win + streak bonus, returns the new streak
+	recordLoss: (Player) -> (),
 	equippedSkin: (Player) -> string,
 }
 
@@ -55,8 +56,11 @@ function EconomyServer.start(): Economy
 	end
 
 	return {
-		awardWin = function(player: Player)
-			PlayerData.addTacs(player, Config.TacsPerWin)
+		awardWin = function(player: Player): number
+			return PlayerData.recordWin(player)
+		end,
+		recordLoss = function(player: Player)
+			PlayerData.recordLoss(player)
 		end,
 		equippedSkin = function(player: Player): string
 			return PlayerData.equippedSkin(player)
