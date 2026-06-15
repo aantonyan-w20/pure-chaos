@@ -19,14 +19,13 @@ local ROW_COLOR = Color3.fromRGB(48, 52, 64)
 
 local REASON_TEXT = {
 	NotEnoughTacs = "Not enough Tacs — win games to earn more!",
-	NeedGamepass = "You need the Pro gamepass for this roll.",
-	GamepassNotConfigured = "The Pro gamepass isn't set up yet.",
+	ProductNotConfigured = "The Pro Roll isn't set up yet.",
 	BadRequest = "Something went wrong, try again.",
 }
 
 local function costText(roll): string
-	if roll.requiresGamepass then
-		return ("Gamepass (%d Robux)"):format(Config.ProRollRobuxPrice)
+	if roll.requiresProduct then
+		return ("%d Robux each"):format(Config.ProRollRobuxPrice)
 	end
 	return roll.costTacs .. " Tacs"
 end
@@ -65,7 +64,8 @@ end
 function RollShop.create(
 	gui: ScreenGui,
 	requestRoll: (string) -> any,
-	promptGamepass: () -> (),
+	promptProduct: () -> (),
+	rollResultEvent: RemoteEvent,
 	onOpened: () -> ()
 )
 	local panel = Widgets.frame(
@@ -82,8 +82,30 @@ function RollShop.create(
 
 	local reveal = RollReveal.create(gui)
 
+	-- A paid roll's outcome arrives later (after the Robux purchase), so
+	-- the server pushes it here and we play the reveal then.
+	rollResultEvent.OnClientEvent:Connect(function(outcome)
+		if type(outcome) == "table" and outcome.ok then
+			local roll = Rolls.byId(outcome.rollId)
+			if roll then
+				reveal.play(roll, outcome.skinId, outcome.isNew, function() end)
+			end
+		end
+	end)
+
+	-- Paid (Robux) roll: open the purchase prompt; the reveal plays when
+	-- the server confirms the purchase via rollResultEvent.
+	local function doProductRoll()
+		if Config.ProRollProductId == 0 then
+			result.Text = REASON_TEXT.ProductNotConfigured
+		else
+			result.Text = ""
+			promptProduct()
+		end
+	end
+
 	local rolling = false
-	local function doRoll(roll)
+	local function doTacsRoll(roll)
 		if rolling then
 			return
 		end
@@ -105,9 +127,14 @@ function RollShop.create(
 		else
 			result.Text = REASON_TEXT[outcome.reason] or REASON_TEXT.BadRequest
 			rolling = false
-			if outcome.reason == "NeedGamepass" then
-				promptGamepass()
-			end
+		end
+	end
+
+	local function doRoll(roll)
+		if roll.requiresProduct then
+			doProductRoll()
+		else
+			doTacsRoll(roll)
 		end
 	end
 

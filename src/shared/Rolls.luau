@@ -35,7 +35,7 @@ Rolls.Catalog = {
 	{
 		id = "pro",
 		name = "Pro Roll",
-		requiresGamepass = true,
+		requiresProduct = true, -- paid per roll with Robux (Developer Product)
 		items = {
 			{ skin = "ColorShift", weight = 10 },
 			{ skin = "Invisible", weight = 40 },

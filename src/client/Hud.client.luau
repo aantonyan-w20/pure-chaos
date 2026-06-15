@@ -22,6 +22,7 @@ local profileEvent = ReplicatedStorage:WaitForChild(names.ProfileUpdated)
 local getProfile = ReplicatedStorage:WaitForChild(names.GetProfile)
 local equipEvent = ReplicatedStorage:WaitForChild(names.EquipSkin)
 local rollFunction = ReplicatedStorage:WaitForChild(names.RequestRoll)
+local rollResultEvent = ReplicatedStorage:WaitForChild(names.RollResult)
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "Hud"
@@ -39,8 +40,8 @@ end)
 shop = RollShop.create(gui, function(rollId)
 	return rollFunction:InvokeServer(rollId)
 end, function()
-	MarketplaceService:PromptGamePassPurchase(player, Config.ProRollGamepassId)
-end, function()
+	MarketplaceService:PromptProductPurchase(player, Config.ProRollProductId)
+end, rollResultEvent, function()
 	inventory.close()
 end)
 

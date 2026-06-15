@@ -43,14 +43,17 @@ Config.TacsPerWin = 20
 -- Each consecutive match win past the first adds this much (streak 2 = +5,
 -- streak 3 = +10, ...). A loss resets the streak.
 Config.WinStreakBonus = 5
-Config.ProRollGamepassId = 0 -- paste the real gamepass id from the Creator Hub here
-Config.ProRollRobuxPrice = 39 -- display only; the actual price is set on the Creator Hub
+-- The Pro Roll is a Developer Product: players pay Robux every time they
+-- roll it. Paste the product id from the Creator Hub here.
+Config.ProRollProductId = 0
+Config.ProRollRobuxPrice = 39 -- display only; the real price is set on the Creator Hub
 
 Config.EconomyRemotes = {
 	ProfileUpdated = "ProfileUpdated",
 	GetProfile = "GetProfile",
 	EquipSkin = "EquipSkin",
 	RequestRoll = "RequestRoll",
+	RollResult = "RollResult", -- server pushes a paid (product) roll's outcome here
 }
 
 Config.Colors = {
