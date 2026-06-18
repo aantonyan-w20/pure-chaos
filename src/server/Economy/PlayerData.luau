@@ -11,6 +11,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local Policy = require(script.Parent.Policy)
 
 local PlayerData = {}
 
@@ -46,6 +47,9 @@ local function load(player: Player)
 		ownedSet = { [DEFAULT_SKIN] = true },
 		equipped = DEFAULT_SKIN,
 		streak = 0, -- consecutive match wins; resets on a loss
+		-- whether Roblox policy bars this player from paid random items
+		-- (the Pro Roll); session-only, not saved. Defaults to restricted.
+		paidRandomRestricted = true,
 		canSave = false,
 	}
 	if store then
@@ -66,6 +70,7 @@ local function load(player: Player)
 			end
 		end
 	end
+	profile.paidRandomRestricted = Policy.isPaidRandomRestricted(player)
 	profiles[player] = profile
 	notify(player)
 end
@@ -120,6 +125,7 @@ function PlayerData.snapshot(player: Player)
 		equipped = profile.equipped,
 		owned = ownedList(profile),
 		streak = profile.streak,
+		paidRandomRestricted = profile.paidRandomRestricted,
 	}
 end
 

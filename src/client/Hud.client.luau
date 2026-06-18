@@ -51,6 +51,7 @@ local function applyProfile(profile)
 	end
 	tacsBox.set(profile.tacs)
 	inventory.update(profile)
+	shop.setRestricted(profile.paidRandomRestricted == true)
 end
 
 profileEvent.OnClientEvent:Connect(applyProfile)

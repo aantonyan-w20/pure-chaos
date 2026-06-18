@@ -116,6 +116,11 @@ Roblox) and configured on [create.roblox.com](https://create.roblox.com):
    pushes the result back to play the reveal. Purchases only complete in a
    published, live game — not in Studio's local playtest.
 
+   The Pro Roll is a "paid random item" (loot box), so the server checks
+   Roblox's `PolicyService` (`ArePaidRandomItemsRestricted`) on join and the
+   client locks the Pro Roll for players who aren't allowed it by age or
+   region. The roll odds are shown in the panel, as Roblox requires.
+
 ## Ground rules so we don't clobber each other
 
 - **Always `git pull` before you start working.**

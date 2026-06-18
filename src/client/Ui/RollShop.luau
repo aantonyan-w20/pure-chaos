@@ -20,8 +20,12 @@ local ROW_COLOR = Color3.fromRGB(48, 52, 64)
 local REASON_TEXT = {
 	NotEnoughTacs = "Not enough Tacs — win games to earn more!",
 	ProductNotConfigured = "The Pro Roll isn't set up yet.",
+	Restricted = "The Pro Roll isn't available for your account.",
 	BadRequest = "Something went wrong, try again.",
 }
+
+local BUTTON_COLOR = Color3.fromRGB(55, 60, 75)
+local DISABLED_COLOR = Color3.fromRGB(70, 70, 78)
 
 local function costText(roll): string
 	if roll.requiresProduct then
@@ -39,7 +43,7 @@ local function oddsText(roll): string
 	return table.concat(parts, "  •  ")
 end
 
-local function addRow(panel: Frame, index: number, roll, onRoll: () -> ())
+local function addRow(panel: Frame, index: number, roll, onRoll: () -> ()): TextButton
 	local row = Instance.new("Frame")
 	row.BackgroundColor3 = ROW_COLOR
 	row.BorderSizePixel = 0
@@ -58,7 +62,7 @@ local function addRow(panel: Frame, index: number, roll, onRoll: () -> ())
 	odds.TextXAlignment = Enum.TextXAlignment.Left
 	odds.TextColor3 = Color3.fromRGB(190, 195, 205)
 
-	Widgets.button(row, "Roll!", UDim2.new(0, 90, 0, 40), UDim2.new(1, -100, 0.5, -20), onRoll)
+	return Widgets.button(row, "Roll!", UDim2.new(0, 90, 0, 40), UDim2.new(1, -100, 0.5, -20), onRoll)
 end
 
 function RollShop.create(
@@ -93,10 +97,15 @@ function RollShop.create(
 		end
 	end)
 
+	-- Set true when Roblox policy bars this player from paid random items
+	local restricted = false
+
 	-- Paid (Robux) roll: open the purchase prompt; the reveal plays when
 	-- the server confirms the purchase via rollResultEvent.
 	local function doProductRoll()
-		if Config.ProRollProductId == 0 then
+		if restricted then
+			result.Text = REASON_TEXT.Restricted
+		elseif Config.ProRollProductId == 0 then
 			result.Text = REASON_TEXT.ProductNotConfigured
 		else
 			result.Text = ""
@@ -138,10 +147,14 @@ function RollShop.create(
 		end
 	end
 
+	local proButton: TextButton? = nil
 	for index, roll in ipairs(Rolls.Catalog) do
-		addRow(panel, index, roll, function()
+		local button = addRow(panel, index, roll, function()
 			doRoll(roll)
 		end)
+		if roll.requiresProduct then
+			proButton = button
+		end
 	end
 
 	Widgets.button(gui, "Rolls", UDim2.new(0, 130, 0, 44), UDim2.new(0, 12, 0.5, 26), function()
@@ -151,10 +164,22 @@ function RollShop.create(
 		end
 	end, Vector2.new(0, 0.5))
 
+	-- Greys out and locks the Pro Roll button for restricted players
+	local function setRestricted(value: boolean)
+		restricted = value
+		if proButton then
+			proButton.Text = value and "Locked" or "Roll!"
+			proButton.Active = not value
+			proButton.AutoButtonColor = not value
+			proButton.BackgroundColor3 = value and DISABLED_COLOR or BUTTON_COLOR
+		end
+	end
+
 	return {
 		close = function()
 			panel.Visible = false
 		end,
+		setRestricted = setRestricted,
 	}
 end
 
