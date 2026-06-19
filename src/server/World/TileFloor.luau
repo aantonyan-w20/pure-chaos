@@ -1,9 +1,10 @@
 --[[
 	TileFloor
-	Lays the green tiled ground on top of an island: a square pad whose
-	top face is a SurfaceGui checkerboard of two greens with thin grid
-	lines — the look of small tiles, built with no uploaded image. The
-	pad stays inside the round island so its corners never overhang.
+	Lays the green tiled ground on top of an island: a round pad the full
+	island diameter whose top face is a SurfaceGui checkerboard of two
+	greens with thin grid lines — the look of small tiles, built with no
+	uploaded image. Because the pad is a cylinder, the SurfaceGui is
+	clipped to its circle, so the tiles cover the whole round island top.
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -46,21 +47,25 @@ local function buildCheckerboard(surface: SurfaceGui, tiles: number)
 end
 
 function TileFloor.build(parent: Instance, cx: number, cz: number, diameter: number)
-	local side = diameter * Config.TileCoverage
-	local tiles = math.max(4, math.floor(side / Config.TileWorldSize + 0.5))
+	local span = diameter * Config.TileCoverage
+	local tiles = math.max(4, math.floor(span / Config.TileWorldSize + 0.5))
 
-	-- thin pad sitting just above the grass so the two surfaces don't z-fight
+	-- A thin round pad matching the island disc, rotated so its flat circular
+	-- cap faces straight up (same rotation the island layers use).
 	local pad = PartBuilder.make(parent, {
 		Name = "TileFloor",
-		Size = Vector3.new(side, 0.2, side),
-		Position = Vector3.new(cx, Config.IslandTop + 0.05, cz),
+		Shape = Enum.PartType.Cylinder,
+		Size = Vector3.new(0.3, span, span),
+		CFrame = CFrame.new(cx, Config.IslandTop + 0.05, cz) * CFrame.Angles(0, 0, math.rad(90)),
 		Color = Config.Colors.TileDark,
 		Material = Enum.Material.SmoothPlastic,
 	})
 
+	-- After that rotation the up-facing cap is the cylinder's +X (Right) face;
+	-- a SurfaceGui there is clipped to the circle, giving a round tiled top.
 	local surface = Instance.new("SurfaceGui")
 	surface.Name = "Tiles"
-	surface.Face = Enum.NormalId.Top
+	surface.Face = Enum.NormalId.Right
 	surface.SizingMode = Enum.SurfaceGuiSizingMode.FixedSize
 	surface.CanvasSize = Vector2.new(RESOLUTION, RESOLUTION)
 	surface.LightInfluence = 1 -- shaded by sun/shadows so it reads as real ground

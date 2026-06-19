@@ -71,10 +71,10 @@ Config.Colors = {
 	TileLine = Color3.fromRGB(96, 170, 92),
 }
 
--- Tiled ground: each island gets a square checkerboard pad on top. The pad
--- stays inside the round island (0.7 of the diameter keeps its corners in).
+-- Tiled ground: each island gets a round checkerboard pad covering its whole
+-- top (TileCoverage = 1 matches the island diameter exactly).
 Config.TileWorldSize = 2.8 -- roughly how many studs wide one tile is
-Config.TileCoverage = 0.7
+Config.TileCoverage = 1.0
 
 -- Derived values (computed once so nobody re-derives them slightly differently)
 Config.CellStep = Config.CellSize + Config.CellGap
