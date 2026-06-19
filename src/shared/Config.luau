@@ -75,7 +75,7 @@ Config.Colors = {
 -- Tiled ground: each island gets a round pad covering its whole top, wearing
 -- the ground image as a tiling Texture. Upload the picture to Roblox (it gives
 -- an rbxassetid) and paste it here; until then the ground is plain green.
-Config.GroundTextureId = "" -- e.g. "rbxassetid://1234567890"
+Config.GroundTextureId = "rbxassetid://103043619626526" -- the green tile ground image
 Config.GroundTextureTileStuds = 16 -- studs per repeat of the image
 Config.TileCoverage = 1.0 -- 1 matches the island diameter exactly
 
