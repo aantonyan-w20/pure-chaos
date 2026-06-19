@@ -32,6 +32,9 @@ Config.SceneSeed = 7
 -- Portal locations (the mystery one is derived below)
 Config.HubPortalPosition = Vector3.new(15, 0, 15)
 
+-- A red landmark tree just off the spawn pad's north edge
+Config.SpawnTreePosition = Vector3.new(0, 0, -7)
+
 -- The RemoteEvent name the server and client camera agree on
 Config.MatchEventName = "TableMatchEvent"
 
@@ -57,6 +60,7 @@ Config.Colors = {
 	LightWood = Color3.fromRGB(124, 92, 62),
 	XChair = Color3.fromRGB(168, 82, 72), -- reddish backrest = X chair
 	OChair = Color3.fromRGB(82, 106, 160), -- bluish backrest = O chair
+	RedLeaves = Color3.fromRGB(200, 45, 45), -- the red spawn-landmark tree
 	Grass = Color3.fromRGB(86, 153, 56),
 	Dirt = Color3.fromRGB(106, 74, 52),
 	Stone = Color3.fromRGB(120, 122, 130),
