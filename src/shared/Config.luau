@@ -61,11 +61,20 @@ Config.Colors = {
 	XChair = Color3.fromRGB(168, 82, 72), -- reddish backrest = X chair
 	OChair = Color3.fromRGB(82, 106, 160), -- bluish backrest = O chair
 	RedLeaves = Color3.fromRGB(200, 45, 45), -- the red spawn-landmark tree
-	Grass = Color3.fromRGB(86, 153, 56),
+	Grass = Color3.fromRGB(120, 200, 108), -- bright green rim that blends with the tiles
 	Dirt = Color3.fromRGB(106, 74, 52),
 	Stone = Color3.fromRGB(120, 122, 130),
 	Ocean = Color3.fromRGB(52, 124, 212),
+	-- The two-tone tiled ground (a green checkerboard) and its grid lines
+	TileLight = Color3.fromRGB(170, 232, 140),
+	TileDark = Color3.fromRGB(120, 202, 108),
+	TileLine = Color3.fromRGB(96, 170, 92),
 }
+
+-- Tiled ground: each island gets a square checkerboard pad on top. The pad
+-- stays inside the round island (0.7 of the diameter keeps its corners in).
+Config.TileWorldSize = 2.8 -- roughly how many studs wide one tile is
+Config.TileCoverage = 0.7
 
 -- Derived values (computed once so nobody re-derives them slightly differently)
 Config.CellStep = Config.CellSize + Config.CellGap

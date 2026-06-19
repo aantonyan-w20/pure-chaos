@@ -14,6 +14,7 @@ local Environment = require(script.Parent.World.Environment)
 local Island = require(script.Parent.World.Island)
 local Portal = require(script.Parent.World.Portal)
 local Scenery = require(script.Parent.World.Scenery)
+local TileFloor = require(script.Parent.World.TileFloor)
 local EconomyServer = require(script.Parent.Economy.EconomyServer)
 local GameTable = require(script.Parent.TicTacToe.GameTable)
 
@@ -33,16 +34,18 @@ worldFolder.Parent = workspace
 local function makeSpawnPad()
 	local spawnPad = Instance.new("SpawnLocation")
 	spawnPad.Size = Vector3.new(10, 1, 10)
-	spawnPad.Position = Vector3.new(0, Config.IslandTop + 0.5, 0)
+	-- sit flush with the tiled floor and wear a tile color so it blends in
+	spawnPad.Position = Vector3.new(0, Config.IslandTop - 0.3, 0)
 	spawnPad.Anchored = true
-	spawnPad.Color = Config.Colors.Grass
-	spawnPad.Material = Enum.Material.Grass
+	spawnPad.Color = Config.Colors.TileLight
+	spawnPad.Material = Enum.Material.SmoothPlastic
 	spawnPad.Duration = 0
 	spawnPad.Parent = worldFolder
 end
 
 local function buildHub()
 	Island.build(worldFolder, 0, 0, Config.HubDiameter)
+	TileFloor.build(worldFolder, 0, 0, Config.HubDiameter)
 	makeSpawnPad()
 	-- A red tree right by spawn as a landmark
 	Scenery.placeTree(worldFolder, Config.SpawnTreePosition, Config.Colors.RedLeaves)
@@ -52,6 +55,7 @@ end
 
 local function buildIslandWithTable(cx: number, cz: number)
 	Island.build(worldFolder, cx, cz, Config.GameIslandDiameter)
+	TileFloor.build(worldFolder, cx, cz, Config.GameIslandDiameter)
 	GameTable.create(worldFolder, cx, cz, false, matchEvent, economy)
 	Scenery.decorate(worldFolder, cx, cz, Config.GameIslandDiameter, 8)
 end
@@ -100,6 +104,7 @@ end
 local function buildMysteryIsland()
 	local mystery = Config.MysteryIslandPosition
 	Island.build(worldFolder, mystery.X, mystery.Z, Config.GameIslandDiameter)
+	TileFloor.build(worldFolder, mystery.X, mystery.Z, Config.GameIslandDiameter)
 	GameTable.create(worldFolder, mystery.X, mystery.Z, true, matchEvent, economy)
 	Scenery.decorate(
 		worldFolder,
