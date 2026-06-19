@@ -13,12 +13,9 @@ Config.CellGap = 0.25
 Config.BoardHeight = 0.2
 Config.GridWallHeight = 0.4
 
--- Island layout
-Config.IslandTop = 50 -- Y level of every island's grass surface
-Config.HubDiameter = 50
+-- Island layout (the mystery island is still a floating disc)
+Config.IslandTop = 50 -- Y level of the platform surface and island tops
 Config.GameIslandDiameter = 40
-Config.IslandDistance = 75 -- hub center to each game island center
-Config.BridgeWidth = 6
 
 -- Furniture
 Config.TableSize = 6
@@ -29,8 +26,15 @@ Config.MysteryIslandPosition = Vector3.new(300, 0, 300)
 -- Fixed seed so the park's trees and rocks land in the same spots every server
 Config.SceneSeed = 7
 
--- Portal locations (the mystery one is derived below)
-Config.HubPortalPosition = Vector3.new(15, 0, 15)
+-- The classic tables sit on one big platform in an evenly spaced grid
+Config.PlatformTableColumns = 4
+Config.PlatformTableRows = 3
+Config.TableSpacing = 30 -- studs between neighboring tables
+Config.PlatformMargin = 35 -- clear space from the outer tables to the platform edge
+
+-- Portal to the mystery island, parked near the platform's front edge
+-- (clear of the table grid). The mystery one is derived below.
+Config.HubPortalPosition = Vector3.new(0, 0, 55)
 
 -- A red landmark tree just off the spawn pad's north edge
 Config.SpawnTreePosition = Vector3.new(0, 0, -7)
@@ -61,16 +65,26 @@ Config.Colors = {
 	XChair = Color3.fromRGB(168, 82, 72), -- reddish backrest = X chair
 	OChair = Color3.fromRGB(82, 106, 160), -- bluish backrest = O chair
 	RedLeaves = Color3.fromRGB(200, 45, 45), -- the red spawn-landmark tree
-	Grass = Color3.fromRGB(86, 153, 56),
+	Grass = Color3.fromRGB(120, 200, 108), -- bright green island rim
 	Dirt = Color3.fromRGB(106, 74, 52),
 	Stone = Color3.fromRGB(120, 122, 130),
 	Ocean = Color3.fromRGB(52, 124, 212),
+	GroundBase = Color3.fromRGB(120, 202, 108), -- green shown until the ground image loads
 }
+
+-- Tiled ground: each island gets a round pad covering its whole top, wearing
+-- the ground image as a tiling Texture. Upload the picture to Roblox (it gives
+-- an rbxassetid) and paste it here; until then the ground is plain green.
+Config.GroundTextureId = "" -- e.g. "rbxassetid://1234567890"
+Config.GroundTextureTileStuds = 16 -- studs per repeat of the image
+Config.TileCoverage = 1.0 -- 1 matches the island diameter exactly
 
 -- Derived values (computed once so nobody re-derives them slightly differently)
 Config.CellStep = Config.CellSize + Config.CellGap
 Config.BoardLength = 3 * Config.CellSize + 4 * Config.CellGap
 Config.TableTopY = Config.IslandTop + 3
 Config.MysteryPortalPosition = Config.MysteryIslandPosition + Vector3.new(-13, 0, -13)
+Config.PlatformWidth = (Config.PlatformTableColumns - 1) * Config.TableSpacing + 2 * Config.PlatformMargin
+Config.PlatformDepth = (Config.PlatformTableRows - 1) * Config.TableSpacing + 2 * Config.PlatformMargin
 
 return Config

@@ -1,11 +1,11 @@
 # Pure Chaos — Tic Tac Toe Park
 
-A Roblox game built by two friends. Floating islands in the sky, connected by
-wooden bridges, each with a tic-tac-toe table. Sit in the **red chair** to play
-X, the **blue chair** to play O — when both chairs fill up, the cameras cut to
-a cinematic "you VS them" intro and lock to a top-down view of the board. A
-hidden portal leads to a mystery island where the rules flip: making three in
-a row **loses** (misère tic-tac-toe).
+A Roblox game built by two friends. One big floating platform holds a grid of
+tic-tac-toe tables. Sit in the **red chair** to play X, the **blue chair** to
+play O — when both chairs fill up, the cameras cut to a cinematic "you VS them"
+intro and lock to a top-down view of the board. A hidden portal leads to a
+separate mystery island where the rules flip: making three in a row **loses**
+(misère tic-tac-toe).
 
 Winning a game earns **15 Tacs**, the in-game currency (shown bottom-left).
 Spend Tacs on **skin rolls** — randomized X/O skins like Rainbow, Cursive, or
@@ -27,7 +27,7 @@ src/
     Rolls.luau               the three roll crates: prices and odds
   server/
     Main.server.luau         entry point: builds the park at startup
-    World/                   island, bridge, portal, scenery, sky builders
+    World/                   platform, island, portal, scenery, sky, tile-floor builders
     Economy/
       PlayerData.luau        Tacs/skins profiles, saved to a DataStore
       RollService.luau       validates rolls, throws the weighted dice
