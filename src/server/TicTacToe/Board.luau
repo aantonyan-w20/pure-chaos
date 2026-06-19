@@ -88,6 +88,11 @@ function Board:drawMark(cellNumber: number, symbol: string, skinId: string?)
 	local label = Instance.new("TextLabel")
 	label.Parent = gui
 	Skins.apply(label, skinId or "Classic", symbol)
+
+	-- X is placed rotated 90 degrees
+	if symbol == "X" then
+		label.Rotation = 90
+	end
 end
 
 function Board:highlightLine(line: { number }, color: Color3)
