@@ -44,6 +44,8 @@ end
 local function buildHub()
 	Island.build(worldFolder, 0, 0, Config.HubDiameter)
 	makeSpawnPad()
+	-- A red tree right by spawn as a landmark
+	Scenery.placeTree(worldFolder, Config.SpawnTreePosition, Config.Colors.RedLeaves)
 	-- keep-clear: no trees/rocks blocking the portal to the mystery island
 	Scenery.decorate(worldFolder, 0, 0, Config.HubDiameter, 14, { Config.HubPortalPosition })
 end

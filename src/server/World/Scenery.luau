@@ -14,7 +14,9 @@ local Scenery = {}
 
 local rng = Random.new(Config.SceneSeed)
 
-local function makeTree(parent: Instance, x: number, z: number)
+-- leafColor overrides the usual green-with-jitter when given (e.g. the red
+-- spawn tree); otherwise each clump picks a slightly different green shade.
+local function makeTree(parent: Instance, x: number, z: number, leafColor: Color3?)
 	local top = Config.IslandTop
 	local height = rng:NextNumber(4.5, 6.5)
 	PartBuilder.make(parent, {
@@ -35,11 +37,17 @@ local function makeTree(parent: Instance, x: number, z: number)
 				top + height + rng:NextNumber(0, 1.6),
 				z + rng:NextNumber(-1.4, 1.4)
 			),
-			Color = Color3.fromRGB(58 + shade, 125 + shade, 21 + math.max(shade, 0)),
+			Color = leafColor or Color3.fromRGB(58 + shade, 125 + shade, 21 + math.max(shade, 0)),
 			Material = Enum.Material.Grass,
 			CanCollide = false,
 		})
 	end
+end
+
+-- Places a single tree at an exact spot (x, z taken from `position`), used for
+-- deliberate landmarks like the red tree by the spawn pad.
+function Scenery.placeTree(parent: Instance, position: Vector3, leafColor: Color3?)
+	makeTree(parent, position.X, position.Z, leafColor)
 end
 
 local function makeRock(parent: Instance, x: number, z: number)
