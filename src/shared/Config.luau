@@ -61,20 +61,19 @@ Config.Colors = {
 	XChair = Color3.fromRGB(168, 82, 72), -- reddish backrest = X chair
 	OChair = Color3.fromRGB(82, 106, 160), -- bluish backrest = O chair
 	RedLeaves = Color3.fromRGB(200, 45, 45), -- the red spawn-landmark tree
-	Grass = Color3.fromRGB(120, 200, 108), -- bright green rim that blends with the tiles
+	Grass = Color3.fromRGB(120, 200, 108), -- bright green island rim
 	Dirt = Color3.fromRGB(106, 74, 52),
 	Stone = Color3.fromRGB(120, 122, 130),
 	Ocean = Color3.fromRGB(52, 124, 212),
-	-- The two-tone tiled ground (a green checkerboard) and its grid lines
-	TileLight = Color3.fromRGB(170, 232, 140),
-	TileDark = Color3.fromRGB(120, 202, 108),
-	TileLine = Color3.fromRGB(96, 170, 92),
+	GroundBase = Color3.fromRGB(120, 202, 108), -- green shown until the ground image loads
 }
 
--- Tiled ground: each island gets a round checkerboard pad covering its whole
--- top (TileCoverage = 1 matches the island diameter exactly).
-Config.TileWorldSize = 2.8 -- roughly how many studs wide one tile is
-Config.TileCoverage = 1.0
+-- Tiled ground: each island gets a round pad covering its whole top, wearing
+-- the ground image as a tiling Texture. Upload the picture to Roblox (it gives
+-- an rbxassetid) and paste it here; until then the ground is plain green.
+Config.GroundTextureId = "" -- e.g. "rbxassetid://1234567890"
+Config.GroundTextureTileStuds = 16 -- studs per repeat of the image
+Config.TileCoverage = 1.0 -- 1 matches the island diameter exactly
 
 -- Derived values (computed once so nobody re-derives them slightly differently)
 Config.CellStep = Config.CellSize + Config.CellGap

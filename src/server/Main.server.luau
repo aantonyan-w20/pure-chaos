@@ -34,13 +34,14 @@ worldFolder.Parent = workspace
 local function makeSpawnPad()
 	local spawnPad = Instance.new("SpawnLocation")
 	spawnPad.Size = Vector3.new(10, 1, 10)
-	-- sit just above the tiled floor and wear a tile color so it blends in
+	-- sit just above the tiled floor and wear the same ground image so it blends
 	spawnPad.Position = Vector3.new(0, Config.IslandTop - 0.2, 0)
 	spawnPad.Anchored = true
-	spawnPad.Color = Config.Colors.TileLight
+	spawnPad.Color = Config.Colors.GroundBase
 	spawnPad.Material = Enum.Material.SmoothPlastic
 	spawnPad.Duration = 0
 	spawnPad.Parent = worldFolder
+	TileFloor.applyTexture(spawnPad, Enum.NormalId.Top)
 end
 
 local function buildHub()
