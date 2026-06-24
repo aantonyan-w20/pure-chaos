@@ -120,12 +120,27 @@ function InventoryPanel.create(gui: ScreenGui, onEquip: (string) -> (), onClaim:
 	grid.SortOrder = Enum.SortOrder.LayoutOrder
 	grid.Parent = scroll
 
-	Widgets.button(gui, "Inventory", UDim2.new(0, 130, 0, 44), UDim2.new(0, 12, 0.5, -26), function()
+	local invButton = Widgets.button(gui, "Inventory", UDim2.new(0, 130, 0, 44), UDim2.new(0, 12, 0.5, -26), function()
 		panel.Visible = not panel.Visible
 		if panel.Visible then
 			onOpened()
 		end
 	end, Vector2.new(0, 0.5))
+
+	-- A red "!" badge that pops up when there are unclaimed free rolls
+	local badge = Instance.new("TextLabel")
+	badge.Name = "Badge"
+	badge.Size = UDim2.fromOffset(24, 24)
+	badge.AnchorPoint = Vector2.new(0.5, 0.5)
+	badge.Position = UDim2.new(1, 0, 0, 3)
+	badge.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
+	badge.Font = Enum.Font.GothamBold
+	badge.TextScaled = true
+	badge.TextColor3 = Color3.new(1, 1, 1)
+	badge.Text = "!"
+	badge.Visible = false
+	Widgets.round(badge, 12)
+	badge.Parent = invButton
 
 	local lastProfile = nil
 	local function rebuild()
@@ -142,10 +157,19 @@ function InventoryPanel.create(gui: ScreenGui, onEquip: (string) -> (), onClaim:
 		end
 	end
 
+	local function totalFreeRolls(freeRolls): number
+		local total = 0
+		for _, count in pairs(freeRolls or {}) do
+			total += count
+		end
+		return total
+	end
+
 	return {
 		update = function(profile)
 			lastProfile = profile
 			refreshFreeRolls(profile.freeRolls)
+			badge.Visible = totalFreeRolls(profile.freeRolls) > 0
 			rebuild()
 		end,
 		close = function()
