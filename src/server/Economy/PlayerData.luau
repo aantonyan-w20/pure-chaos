@@ -16,6 +16,7 @@ local PlayerData = {}
 
 local STORE_NAME = "PlayerProfiles_v1"
 local DEFAULT_SKIN = "Classic"
+local DEFAULT_CHAIR = "Wood"
 
 local profiles = {}
 local notifyChanged = nil
@@ -31,10 +32,10 @@ local function notify(player: Player)
 	end
 end
 
-local function ownedList(profile): { string }
+local function setToList(set): { string }
 	local list = {}
-	for skinId in pairs(profile.ownedSet) do
-		table.insert(list, skinId)
+	for id in pairs(set) do
+		table.insert(list, id)
 	end
 	table.sort(list)
 	return list
@@ -45,6 +46,8 @@ local function load(player: Player)
 		tacs = 0,
 		ownedSet = { [DEFAULT_SKIN] = true },
 		equipped = DEFAULT_SKIN,
+		ownedChairs = { [DEFAULT_CHAIR] = true },
+		equippedChair = DEFAULT_CHAIR,
 		freeRolls = {}, -- rollId -> count of claimable free rolls
 		secretClaimed = false, -- has this player used the hidden button?
 		canSave = false,
@@ -64,8 +67,14 @@ local function load(player: Player)
 				for _, skinId in ipairs(saved.owned or {}) do
 					profile.ownedSet[skinId] = true
 				end
+				for _, chairId in ipairs(saved.chairs or {}) do
+					profile.ownedChairs[chairId] = true
+				end
 				if saved.equipped and profile.ownedSet[saved.equipped] then
 					profile.equipped = saved.equipped
+				end
+				if saved.equippedChair and profile.ownedChairs[saved.equippedChair] then
+					profile.equippedChair = saved.equippedChair
 				end
 			end
 		end
@@ -81,8 +90,10 @@ local function save(player: Player)
 	end
 	pcall(store.SetAsync, store, "u_" .. player.UserId, {
 		tacs = profile.tacs,
-		owned = ownedList(profile),
+		owned = setToList(profile.ownedSet),
 		equipped = profile.equipped,
+		chairs = setToList(profile.ownedChairs),
+		equippedChair = profile.equippedChair,
 		freeRolls = profile.freeRolls,
 		secretClaimed = profile.secretClaimed,
 	})
@@ -127,7 +138,9 @@ function PlayerData.snapshot(player: Player)
 	return {
 		tacs = profile.tacs,
 		equipped = profile.equipped,
-		owned = ownedList(profile),
+		owned = setToList(profile.ownedSet),
+		equippedChair = profile.equippedChair,
+		chairs = setToList(profile.ownedChairs),
 		freeRolls = freeRolls,
 	}
 end
@@ -173,6 +186,31 @@ end
 function PlayerData.equippedSkin(player: Player): string
 	local profile = profiles[player]
 	return (profile and profile.equipped) or DEFAULT_SKIN
+end
+
+-- Returns true when the chair wasn't owned yet
+function PlayerData.giveChair(player: Player, chairId: string): boolean
+	local profile = profiles[player]
+	if not profile then
+		return false
+	end
+	local isNew = not profile.ownedChairs[chairId]
+	profile.ownedChairs[chairId] = true
+	notify(player)
+	return isNew
+end
+
+function PlayerData.equipChair(player: Player, chairId: string)
+	local profile = profiles[player]
+	if profile and profile.ownedChairs[chairId] then
+		profile.equippedChair = chairId
+		notify(player)
+	end
+end
+
+function PlayerData.equippedChairOf(player: Player): string
+	local profile = profiles[player]
+	return (profile and profile.equippedChair) or DEFAULT_CHAIR
 end
 
 -- The hidden button's one-time reward. Returns true the first time only.

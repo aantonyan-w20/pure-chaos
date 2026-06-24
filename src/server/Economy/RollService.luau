@@ -19,16 +19,22 @@ local RollService = {}
 local rng = Random.new()
 local ownsProPass: { [Player]: boolean } = {}
 
--- Picks a skin, gives it, and refunds Tacs if it's a duplicate.
-local function grantSkin(player: Player, roll)
-	local skinId = Rolls.pick(roll, rng)
-	local isNew = PlayerData.giveSkin(player, skinId)
+-- Picks the prize (X/O skin or chair, per roll.kind), gives it, and
+-- refunds Tacs if it's a duplicate.
+local function grantItem(player: Player, roll)
+	local id = Rolls.pick(roll, rng)
+	local isNew
+	if roll.kind == "chair" then
+		isNew = PlayerData.giveChair(player, id)
+	else
+		isNew = PlayerData.giveSkin(player, id)
+	end
 	local refund = 0
 	if not isNew then
 		refund = Config.DuplicateRefund
 		PlayerData.addTacs(player, refund)
 	end
-	return { ok = true, skinId = skinId, isNew = isNew, refund = refund }
+	return { ok = true, skinId = id, kind = roll.kind or "mark", isNew = isNew, refund = refund }
 end
 
 local function checkGamepass(player: Player): (boolean, string?)
@@ -63,7 +69,7 @@ function RollService.roll(player: Player, rollId: string)
 		return { ok = false, reason = "NotEnoughTacs" }
 	end
 
-	return grantSkin(player, roll)
+	return grantItem(player, roll)
 end
 
 -- Claims one of the player's free rolls (earned from the secret button).
@@ -75,7 +81,7 @@ function RollService.freeRoll(player: Player, rollId: string)
 	if not PlayerData.useFreeRoll(player, rollId) then
 		return { ok = false, reason = "NoFreeRolls" }
 	end
-	return grantSkin(player, roll)
+	return grantItem(player, roll)
 end
 
 -- A purchase made mid-game unlocks the Pro Roll immediately

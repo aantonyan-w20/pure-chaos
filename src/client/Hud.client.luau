@@ -32,8 +32,8 @@ gui.Parent = player:WaitForChild("PlayerGui")
 local tacsBox = TacsBox.create(gui)
 
 local inventory, shop
-inventory = InventoryPanel.create(gui, function(skinId)
-	equipEvent:FireServer(skinId)
+inventory = InventoryPanel.create(gui, function(kind, id)
+	equipEvent:FireServer(kind, id)
 end, function(rollId)
 	return claimFreeRoll:InvokeServer(rollId)
 end, function()
