@@ -95,10 +95,8 @@ function RollShop.create(
 		end
 		if outcome.ok then
 			local skin = Skins.Catalog[outcome.skinId]
-			result.Text = ("You got: %s %s"):format(
-				skin and skin.name or outcome.skinId,
-				outcome.isNew and "— NEW!" or "(duplicate)"
-			)
+			local tag = outcome.isNew and "— NEW!" or ("(duplicate, +%d Tacs)"):format(outcome.refund or 0)
+			result.Text = ("You got: %s %s"):format(skin and skin.name or outcome.skinId, tag)
 		else
 			result.Text = REASON_TEXT[outcome.reason] or REASON_TEXT.BadRequest
 			if outcome.reason == "NeedGamepass" then
