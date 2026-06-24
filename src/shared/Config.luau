@@ -56,6 +56,11 @@ Config.MatchEventName = "TableMatchEvent"
 -- Economy
 Config.TacsPerWin = 15
 Config.DuplicateRefund = 10 -- Tacs given when a roll lands a skin you already own
+
+-- Developers (anyone in Studio, the experience owner, or a UserId listed here)
+-- get a big Tacs balance on join and the /give and /unlockall chat commands.
+Config.Admins = {}
+Config.AdminTacs = 1000000
 Config.ProRollGamepassId = 0 -- paste the real gamepass id from the Creator Hub here
 Config.ProRollRobuxPrice = 39 -- display only; the actual price is set on the Creator Hub
 
