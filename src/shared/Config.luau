@@ -86,8 +86,8 @@ Config.TableTopY = Config.IslandTop + 3
 Config.MysteryPortalPosition = Config.MysteryIslandPosition + Vector3.new(-13, 0, -13)
 Config.PlatformWidth = (Config.PlatformTableColumns - 1) * Config.TableSpacing + 2 * Config.PlatformMargin
 Config.PlatformDepth = (Config.PlatformTableRows - 1) * Config.TableSpacing + 2 * Config.PlatformMargin
--- Ocean surface sits just below the platform/island tops so they rest on the
--- water instead of floating high in the air.
-Config.WaterSurfaceY = Config.IslandTop - 3
+-- Ocean surface sits a few studs below the tops so the platform and island
+-- rise out of the sea like land (bigger gap = the land stands taller).
+Config.WaterSurfaceY = Config.IslandTop - 8
 
 return Config
