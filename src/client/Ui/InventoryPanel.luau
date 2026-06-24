@@ -68,7 +68,8 @@ local function buildFreeRolls(panel: Frame, onClaim: (string) -> any): (table) -
 		local outcome = onClaim(rollId)
 		if type(outcome) == "table" and outcome.ok then
 			local skin = Skins.Catalog[outcome.skinId]
-			result.Text = "Got " .. (skin and skin.name or outcome.skinId) .. (outcome.isNew and " — NEW!" or "")
+			local tag = outcome.isNew and " — NEW!" or (" (dupe, +" .. tostring(outcome.refund or 0) .. " Tacs)")
+			result.Text = "Got " .. (skin and skin.name or outcome.skinId) .. tag
 		elseif type(outcome) == "table" and outcome.reason == "NoFreeRolls" then
 			result.Text = "No free rolls left"
 		else
