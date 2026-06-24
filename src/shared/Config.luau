@@ -35,7 +35,7 @@ Config.PlatformMargin = 35 -- clear space from the outer tables to the platform 
 Config.PlatformThickness = 30 -- how deep the island block goes (its underside)
 
 -- The hidden red button under the island grants these free rolls (once).
-Config.SecretFreeRolls = { mega = 4, lucky = 4 }
+Config.SecretFreeRolls = { mega = 4, lucky = 4, chairBasic = 4, chairElite = 2 }
 
 -- Sandy stepped shore around the island so players who fall in can climb back up
 Config.BeachWidth = 16 -- how far the shore reaches out from the island edge
