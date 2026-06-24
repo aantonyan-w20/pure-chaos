@@ -1,7 +1,8 @@
 --[[
 	Environment
 	Sets the stage: clears the Studio template leftovers, dials in the
-	sky and fog, and lays the ocean far below the islands.
+	sky and fog, and lays the ocean so its surface sits just under the
+	platform and island tops (they rest on the water).
 ]]
 
 local Lighting = game:GetService("Lighting")
@@ -38,11 +39,13 @@ local function setUpLighting()
 	Lighting.FogEnd = 650
 end
 
+local OCEAN_DEPTH = 60 -- thick slab so the platform's submerged sides sit in water
+
 local function makeOcean(parent: Instance)
 	PartBuilder.make(parent, {
 		Name = "Ocean",
-		Size = Vector3.new(2048, 1, 2048),
-		Position = Vector3.new(0, -15, 0),
+		Size = Vector3.new(2048, OCEAN_DEPTH, 2048),
+		Position = Vector3.new(0, Config.WaterSurfaceY - OCEAN_DEPTH / 2, 0),
 		CanCollide = false,
 		Color = Config.Colors.Ocean,
 		Material = Enum.Material.SmoothPlastic,
