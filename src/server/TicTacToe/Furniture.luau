@@ -58,16 +58,19 @@ local function buildChair(parent: Instance, chairPos: Vector3, cx: number, cz: n
 	seat:SetAttribute("Symbol", symbol)
 	seat.Parent = parent
 
-	PartBuilder.make(parent, {
+	-- Back and legs are parented to the seat (so ChairSkins can find them)
+	-- and tagged with their base size (so scaling skins can restore it).
+	local back = PartBuilder.make(seat, {
 		Name = "ChairBack",
 		Size = Vector3.new(2, 2.2, 0.3),
 		CFrame = seat.CFrame * CFrame.new(0, 1.1, 0.85),
 		Color = (symbol == "X") and Config.Colors.XChair or Config.Colors.OChair,
 	})
+	back:SetAttribute("BaseSize", back.Size)
 
 	local seatHeight = chairPos.Y - Config.IslandTop - 0.15
 	for _, legOffset in ipairs(CHAIR_LEG_OFFSETS) do
-		PartBuilder.make(parent, {
+		local leg = PartBuilder.make(seat, {
 			Name = "ChairLeg",
 			Size = Vector3.new(0.3, seatHeight, 0.3),
 			CFrame = seat.CFrame
@@ -75,6 +78,7 @@ local function buildChair(parent: Instance, chairPos: Vector3, cx: number, cz: n
 				* CFrame.new(0, -seatHeight / 2, 0),
 			Color = Config.Colors.LightWood,
 		})
+		leg:SetAttribute("BaseSize", leg.Size)
 	end
 	return seat
 end

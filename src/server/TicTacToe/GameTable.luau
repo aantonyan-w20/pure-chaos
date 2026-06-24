@@ -18,6 +18,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local ChairSkins = require(ReplicatedStorage.Shared.ChairSkins)
 local Board = require(script.Parent.Board)
 local Furniture = require(script.Parent.Furniture)
 local Logic = require(script.Parent.Logic)
@@ -30,7 +31,18 @@ local RESET_DELAY = 4 -- seconds the final board stays visible
 export type Economy = {
 	awardWin: (Player) -> (),
 	equippedSkin: (Player) -> string,
+	equippedChair: (Player) -> string,
 }
+
+-- Paints the sitter's equipped chair onto the seat, and the default
+-- "Wood" look when it empties.
+local function watchChairSkin(seat: Seat, economy: Economy)
+	seat:GetPropertyChangedSignal("Occupant"):Connect(function()
+		local occupant = seat.Occupant
+		local player = occupant and Players:GetPlayerFromCharacter(occupant.Parent)
+		ChairSkins.apply(seat, (player and economy.equippedChair(player)) or "Wood")
+	end)
+end
 
 function GameTable.create(
 	parent: Instance,
@@ -49,6 +61,9 @@ function GameTable.create(
 		tableZ = cz,
 		boardY = Config.TableTopY,
 	})
+
+	watchChairSkin(xSeat, economy)
+	watchChairSkin(oSeat, economy)
 
 	-- Which symbol does this player control at THIS table?
 	local function symbolForPlayer(player: Player): string?

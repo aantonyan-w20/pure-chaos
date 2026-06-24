@@ -1,10 +1,10 @@
 --[[
 	Rolls
-	The catalog of the three skin rolls and the weighted dice throw.
-	Weights are relative chances — they don't have to sum to 100
-	(the Lucky Roll's add up to 105, so each real chance is
-	weight / 105). The client only uses this for display; the server
-	does the actual rolling.
+	The catalog of rolls and the weighted dice throw. Each roll has a
+	`kind`: "mark" rolls give X/O skins, "chair" rolls give chair skins
+	(absent kind means "mark"). Weights are relative chances — they don't
+	have to sum to 100; each real chance is weight / (sum of weights).
+	The client only uses this for display; the server does the rolling.
 ]]
 
 local Rolls = {}
@@ -40,6 +40,30 @@ Rolls.Catalog = {
 			{ skin = "ColorShift", weight = 10 },
 			{ skin = "Invisible", weight = 40 },
 			{ skin = "Soccer", weight = 50 },
+		},
+	},
+	{
+		id = "chairBasic",
+		name = "Chair Roll",
+		kind = "chair",
+		costTacs = 60,
+		items = {
+			{ skin = "GreenChair", weight = 30 },
+			{ skin = "YellowChair", weight = 30 },
+			{ skin = "TinyChair", weight = 10 },
+			{ skin = "GlitchChair", weight = 5 },
+		},
+	},
+	{
+		id = "chairElite",
+		name = "Elite Chair Roll",
+		kind = "chair",
+		costTacs = 120,
+		items = {
+			{ skin = "HumongousChair", weight = 30 },
+			{ skin = "InvisibleChair", weight = 20 },
+			{ skin = "RainbowChair", weight = 5 },
+			{ skin = "MythicChair", weight = 1 },
 		},
 	},
 }

@@ -16,6 +16,7 @@ local EconomyServer = {}
 export type Economy = {
 	awardWin: (Player) -> (),
 	equippedSkin: (Player) -> string,
+	equippedChair: (Player) -> string,
 	grantSecretReward: (Player) -> boolean,
 }
 
@@ -43,9 +44,14 @@ function EconomyServer.start(): Economy
 		return PlayerData.snapshot(player)
 	end
 
-	equipEvent.OnServerEvent:Connect(function(player, skinId)
-		if type(skinId) == "string" then
-			PlayerData.equip(player, skinId)
+	equipEvent.OnServerEvent:Connect(function(player, kind, id)
+		if type(id) ~= "string" then
+			return
+		end
+		if kind == "chair" then
+			PlayerData.equipChair(player, id)
+		else
+			PlayerData.equip(player, id)
 		end
 	end)
 
@@ -69,6 +75,9 @@ function EconomyServer.start(): Economy
 		end,
 		equippedSkin = function(player: Player): string
 			return PlayerData.equippedSkin(player)
+		end,
+		equippedChair = function(player: Player): string
+			return PlayerData.equippedChairOf(player)
 		end,
 		grantSecretReward = function(player: Player): boolean
 			return PlayerData.grantSecretReward(player)
