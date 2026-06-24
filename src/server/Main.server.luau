@@ -17,6 +17,7 @@ local Portal = require(script.Parent.World.Portal)
 local Scenery = require(script.Parent.World.Scenery)
 local SecretButton = require(script.Parent.World.SecretButton)
 local TileFloor = require(script.Parent.World.TileFloor)
+local Admin = require(script.Parent.Economy.Admin)
 local EconomyServer = require(script.Parent.Economy.EconomyServer)
 local GameTable = require(script.Parent.TicTacToe.GameTable)
 
@@ -28,6 +29,7 @@ matchEvent.Parent = ReplicatedStorage
 
 -- Tacs, skins, and rolls: profiles, remotes, and the win-reward hook
 local economy = EconomyServer.start()
+Admin.start() -- developer perks (free Tacs + /give and /unlockall)
 
 local worldFolder = Instance.new("Folder")
 worldFolder.Name = "TicTacToePark"

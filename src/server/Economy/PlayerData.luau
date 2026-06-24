@@ -153,6 +153,15 @@ function PlayerData.addTacs(player: Player, amount: number)
 	end
 end
 
+-- Raises the balance to at least `amount` (used for the admin top-up).
+function PlayerData.ensureTacs(player: Player, amount: number)
+	local profile = profiles[player]
+	if profile and profile.tacs < amount then
+		profile.tacs = amount
+		notify(player)
+	end
+end
+
 function PlayerData.spendTacs(player: Player, amount: number): boolean
 	local profile = profiles[player]
 	if profile and profile.tacs >= amount then
