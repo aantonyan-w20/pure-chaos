@@ -32,6 +32,12 @@ Config.PlatformTableRows = 3
 Config.TableSpacing = 30 -- studs between neighboring tables
 Config.PlatformMargin = 35 -- clear space from the outer tables to the platform edge
 
+-- Sandy stepped shore around the island so players who fall in can climb back up
+Config.BeachWidth = 16 -- how far the shore reaches out from the island edge
+Config.BeachSteps = 6 -- terraces from the waterline up to the island top
+Config.BeachSegmentLength = 26 -- shorter = more (and more uneven-looking) segments
+Config.BeachJitter = 0.4 -- random height wobble per segment, so it's not a clean line
+
 -- Portal to the mystery island, parked near the platform's front edge
 -- (clear of the table grid). The mystery one is derived below.
 Config.HubPortalPosition = Vector3.new(0, 0, 55)
@@ -70,6 +76,7 @@ Config.Colors = {
 	Stone = Color3.fromRGB(120, 122, 130),
 	Ocean = Color3.fromRGB(52, 124, 212),
 	GroundBase = Color3.fromRGB(120, 202, 108), -- green shown until the ground image loads
+	Sand = Color3.fromRGB(228, 209, 156), -- the shore around the island
 }
 
 -- Tiled ground: each island gets a round pad covering its whole top, wearing

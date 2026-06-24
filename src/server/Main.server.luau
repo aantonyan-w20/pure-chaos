@@ -9,6 +9,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local Beach = require(script.Parent.World.Beach)
 local Environment = require(script.Parent.World.Environment)
 local Island = require(script.Parent.World.Island)
 local Platform = require(script.Parent.World.Platform)
@@ -59,6 +60,7 @@ end
 
 local function buildPlatform()
 	Platform.build(worldFolder)
+	Beach.build(worldFolder)
 	makeSpawnPad()
 	-- A red landmark tree near spawn
 	Scenery.placeTree(worldFolder, Config.SpawnTreePosition, Config.Colors.RedLeaves)
