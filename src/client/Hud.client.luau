@@ -22,6 +22,7 @@ local profileEvent = ReplicatedStorage:WaitForChild(names.ProfileUpdated)
 local getProfile = ReplicatedStorage:WaitForChild(names.GetProfile)
 local equipEvent = ReplicatedStorage:WaitForChild(names.EquipSkin)
 local rollFunction = ReplicatedStorage:WaitForChild(names.RequestRoll)
+local claimFreeRoll = ReplicatedStorage:WaitForChild(names.ClaimFreeRoll)
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "Hud"
@@ -33,6 +34,8 @@ local tacsBox = TacsBox.create(gui)
 local inventory, shop
 inventory = InventoryPanel.create(gui, function(skinId)
 	equipEvent:FireServer(skinId)
+end, function(rollId)
+	return claimFreeRoll:InvokeServer(rollId)
 end, function()
 	shop.close()
 end)

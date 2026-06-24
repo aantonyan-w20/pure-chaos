@@ -20,8 +20,9 @@ Config.GameIslandDiameter = 40
 -- Furniture
 Config.TableSize = 6
 
--- The far-away island with the misere table (3 in a row LOSES there)
-Config.MysteryIslandPosition = Vector3.new(300, 0, 300)
+-- The misere island (3 in a row LOSES there). Parked far past the fog so it
+-- can't be seen from the main island — you only reach it through the portal.
+Config.MysteryIslandPosition = Vector3.new(1200, 0, 0)
 
 -- Fixed seed so the park's trees and rocks land in the same spots every server
 Config.SceneSeed = 7
@@ -31,6 +32,10 @@ Config.PlatformTableColumns = 4
 Config.PlatformTableRows = 3
 Config.TableSpacing = 30 -- studs between neighboring tables
 Config.PlatformMargin = 35 -- clear space from the outer tables to the platform edge
+Config.PlatformThickness = 30 -- how deep the island block goes (its underside)
+
+-- The hidden red button under the island grants these free rolls (once).
+Config.SecretFreeRolls = { mega = 4, lucky = 4 }
 
 -- Sandy stepped shore around the island so players who fall in can climb back up
 Config.BeachWidth = 16 -- how far the shore reaches out from the island edge
@@ -58,6 +63,7 @@ Config.EconomyRemotes = {
 	GetProfile = "GetProfile",
 	EquipSkin = "EquipSkin",
 	RequestRoll = "RequestRoll",
+	ClaimFreeRoll = "ClaimFreeRoll", -- redeem a free roll earned from the secret button
 }
 
 Config.Colors = {

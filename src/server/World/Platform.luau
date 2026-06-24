@@ -14,13 +14,12 @@ local TileFloor = require(script.Parent.TileFloor)
 
 local Platform = {}
 
-local THICKNESS = 30 -- deep land base; reaches well under the waterline
-
 function Platform.build(parent: Instance): Part
+	local thickness = Config.PlatformThickness -- deep land base; reaches under the waterline
 	local slab = PartBuilder.make(parent, {
 		Name = "Platform",
-		Size = Vector3.new(Config.PlatformWidth, THICKNESS, Config.PlatformDepth),
-		Position = Vector3.new(0, Config.IslandTop - THICKNESS / 2, 0),
+		Size = Vector3.new(Config.PlatformWidth, thickness, Config.PlatformDepth),
+		Position = Vector3.new(0, Config.IslandTop - thickness / 2, 0),
 		Color = Config.Colors.Dirt,
 		Material = Enum.Material.Ground,
 	})

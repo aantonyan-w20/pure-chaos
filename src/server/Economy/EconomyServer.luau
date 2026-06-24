@@ -16,6 +16,7 @@ local EconomyServer = {}
 export type Economy = {
 	awardWin: (Player) -> (),
 	equippedSkin: (Player) -> string,
+	grantSecretReward: (Player) -> boolean,
 }
 
 local function makeRemote(className: string, name: string)
@@ -31,6 +32,7 @@ function EconomyServer.start(): Economy
 	local getProfile = makeRemote("RemoteFunction", names.GetProfile)
 	local equipEvent = makeRemote("RemoteEvent", names.EquipSkin)
 	local rollFunction = makeRemote("RemoteFunction", names.RequestRoll)
+	local claimFreeRoll = makeRemote("RemoteFunction", names.ClaimFreeRoll)
 
 	PlayerData.start(function(player)
 		profileEvent:FireClient(player, PlayerData.snapshot(player))
@@ -54,12 +56,22 @@ function EconomyServer.start(): Economy
 		return RollService.roll(player, rollId)
 	end
 
+	claimFreeRoll.OnServerInvoke = function(player, rollId)
+		if type(rollId) ~= "string" then
+			return { ok = false, reason = "BadRequest" }
+		end
+		return RollService.freeRoll(player, rollId)
+	end
+
 	return {
 		awardWin = function(player: Player)
 			PlayerData.addTacs(player, Config.TacsPerWin)
 		end,
 		equippedSkin = function(player: Player): string
 			return PlayerData.equippedSkin(player)
+		end,
+		grantSecretReward = function(player: Player): boolean
+			return PlayerData.grantSecretReward(player)
 		end,
 	}
 end
