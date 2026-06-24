@@ -8,6 +8,9 @@
 
 local DataStoreService = game:GetService("DataStoreService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Config = require(ReplicatedStorage.Shared.Config)
 
 local PlayerData = {}
 
@@ -42,6 +45,8 @@ local function load(player: Player)
 		tacs = 0,
 		ownedSet = { [DEFAULT_SKIN] = true },
 		equipped = DEFAULT_SKIN,
+		freeRolls = {}, -- rollId -> count of claimable free rolls
+		secretClaimed = false, -- has this player used the hidden button?
 		canSave = false,
 	}
 	if store then
@@ -52,6 +57,10 @@ local function load(player: Player)
 			profile.canSave = true
 			if saved then
 				profile.tacs = saved.tacs or 0
+				profile.secretClaimed = saved.secretClaimed or false
+				for rollId, count in pairs(saved.freeRolls or {}) do
+					profile.freeRolls[rollId] = count
+				end
 				for _, skinId in ipairs(saved.owned or {}) do
 					profile.ownedSet[skinId] = true
 				end
@@ -74,6 +83,8 @@ local function save(player: Player)
 		tacs = profile.tacs,
 		owned = ownedList(profile),
 		equipped = profile.equipped,
+		freeRolls = profile.freeRolls,
+		secretClaimed = profile.secretClaimed,
 	})
 end
 
@@ -109,7 +120,16 @@ function PlayerData.snapshot(player: Player)
 	if not profile then
 		return nil
 	end
-	return { tacs = profile.tacs, equipped = profile.equipped, owned = ownedList(profile) }
+	local freeRolls = {}
+	for rollId, count in pairs(profile.freeRolls) do
+		freeRolls[rollId] = count
+	end
+	return {
+		tacs = profile.tacs,
+		equipped = profile.equipped,
+		owned = ownedList(profile),
+		freeRolls = freeRolls,
+	}
 end
 
 function PlayerData.addTacs(player: Player, amount: number)
@@ -153,6 +173,31 @@ end
 function PlayerData.equippedSkin(player: Player): string
 	local profile = profiles[player]
 	return (profile and profile.equipped) or DEFAULT_SKIN
+end
+
+-- The hidden button's one-time reward. Returns true the first time only.
+function PlayerData.grantSecretReward(player: Player): boolean
+	local profile = profiles[player]
+	if not profile or profile.secretClaimed then
+		return false
+	end
+	profile.secretClaimed = true
+	for rollId, count in pairs(Config.SecretFreeRolls) do
+		profile.freeRolls[rollId] = (profile.freeRolls[rollId] or 0) + count
+	end
+	notify(player)
+	return true
+end
+
+-- Spends one free roll of the given type, if the player has any.
+function PlayerData.useFreeRoll(player: Player, rollId: string): boolean
+	local profile = profiles[player]
+	if profile and (profile.freeRolls[rollId] or 0) > 0 then
+		profile.freeRolls[rollId] -= 1
+		notify(player)
+		return true
+	end
+	return false
 end
 
 return PlayerData

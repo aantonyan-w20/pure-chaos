@@ -12,7 +12,8 @@ local Config = require(ReplicatedStorage.Shared.Config)
 
 local Environment = {}
 
-local WATER_EXTENT = 1200 -- how far the sea spreads out around the island
+local WATER_EXTENT = 1200 -- how far the sea spreads out around the main island
+local MYSTERY_SEA_EXTENT = 800 -- a smaller sea around the far-off mystery island
 local WATER_DEPTH = 30 -- deep enough to sit under the island's base
 
 local function clearTemplateLeftovers()
@@ -41,6 +42,11 @@ local function setUpLighting()
 	Lighting.FogEnd = 650
 end
 
+local function fillSea(terrain: Terrain, x: number, z: number, extent: number)
+	local center = Vector3.new(x, Config.WaterSurfaceY - WATER_DEPTH / 2, z)
+	terrain:FillBlock(CFrame.new(center), Vector3.new(extent, WATER_DEPTH, extent), Enum.Material.Water)
+end
+
 local function makeOcean()
 	local terrain = workspace.Terrain
 	terrain:Clear()
@@ -52,9 +58,10 @@ local function makeOcean()
 	terrain.WaterWaveSize = 0.15
 	terrain.WaterWaveSpeed = 12
 
-	local center = Vector3.new(0, Config.WaterSurfaceY - WATER_DEPTH / 2, 0)
-	local size = Vector3.new(WATER_EXTENT, WATER_DEPTH, WATER_EXTENT)
-	terrain:FillBlock(CFrame.new(center), size, Enum.Material.Water)
+	fillSea(terrain, 0, 0, WATER_EXTENT)
+	-- its own patch of sea around the far-off mystery island
+	local mystery = Config.MysteryIslandPosition
+	fillSea(terrain, mystery.X, mystery.Z, MYSTERY_SEA_EXTENT)
 end
 
 function Environment.setup()

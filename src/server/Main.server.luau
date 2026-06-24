@@ -15,6 +15,7 @@ local Island = require(script.Parent.World.Island)
 local Platform = require(script.Parent.World.Platform)
 local Portal = require(script.Parent.World.Portal)
 local Scenery = require(script.Parent.World.Scenery)
+local SecretButton = require(script.Parent.World.SecretButton)
 local TileFloor = require(script.Parent.World.TileFloor)
 local EconomyServer = require(script.Parent.Economy.EconomyServer)
 local GameTable = require(script.Parent.TicTacToe.GameTable)
@@ -65,6 +66,12 @@ local function buildPlatform()
 	-- A red landmark tree near spawn
 	Scenery.placeTree(worldFolder, Config.SpawnTreePosition, Config.Colors.RedLeaves)
 	buildTables()
+
+	-- Secret reward button hidden on the island's underside (swim under to find)
+	local underside = Vector3.new(0, Config.IslandTop - Config.PlatformThickness - 0.4, 0)
+	SecretButton.build(worldFolder, underside, function(player)
+		economy.grantSecretReward(player)
+	end)
 end
 
 local function buildMysteryIsland()

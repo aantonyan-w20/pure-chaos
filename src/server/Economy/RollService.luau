@@ -56,6 +56,20 @@ function RollService.roll(player: Player, rollId: string)
 	return { ok = true, skinId = skinId, isNew = isNew }
 end
 
+-- Claims one of the player's free rolls (earned from the secret button).
+function RollService.freeRoll(player: Player, rollId: string)
+	local roll = Rolls.byId(rollId)
+	if not roll then
+		return { ok = false, reason = "BadRequest" }
+	end
+	if not PlayerData.useFreeRoll(player, rollId) then
+		return { ok = false, reason = "NoFreeRolls" }
+	end
+	local skinId = Rolls.pick(roll, rng)
+	local isNew = PlayerData.giveSkin(player, skinId)
+	return { ok = true, skinId = skinId, isNew = isNew }
+end
+
 -- A purchase made mid-game unlocks the Pro Roll immediately
 -- (UserOwnsGamePassAsync caches its answer, so we track it ourselves)
 MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, passId, purchased)

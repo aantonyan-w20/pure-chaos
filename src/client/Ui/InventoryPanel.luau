@@ -1,9 +1,10 @@
 --[[
 	InventoryPanel
-	The middle-left "Inventory" button and the skin grid it opens.
-	Click an owned skin to equip it; the equipped one gets a green
-	outline. Previews use the exact same Skins.apply styling that the
-	real board marks use, so what you see is what you get.
+	The middle-left "Inventory" button and the panel it opens. The top
+	shows free rolls earned from the secret button (click to claim one,
+	which rolls a skin for free); below is the grid of owned skins —
+	click an owned skin to equip it (the equipped one gets a green
+	outline). Previews use the same Skins.apply styling as the board.
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -15,6 +16,7 @@ local InventoryPanel = {}
 
 local EQUIP_COLOR = Color3.fromRGB(90, 220, 90)
 local CELL_COLOR = Color3.fromRGB(48, 52, 64)
+local FREE_ROLLS = { { id = "mega", label = "Mega" }, { id = "lucky", label = "Lucky" } }
 
 local function addSymbolPreview(cell: TextButton, skinId: string, symbol: string, xScale: number)
 	local holder = Instance.new("Frame")
@@ -57,19 +59,54 @@ local function addCell(scroll: ScrollingFrame, index: number, skinId: string, eq
 	cell.Parent = scroll
 end
 
-function InventoryPanel.create(gui: ScreenGui, onEquip: (string) -> (), onOpened: () -> ())
-	local panel = Widgets.frame(
-		gui,
-		UDim2.new(0, 372, 0, 340),
-		UDim2.new(0, 154, 0.5, 0),
-		Vector2.new(0, 0.5)
-	)
+-- Builds the free-roll claim buttons; returns a function to refresh the counts.
+local function buildFreeRolls(panel: Frame, onClaim: (string) -> any): (table) -> ()
+	local result = Widgets.label(panel, "", UDim2.new(1, -20, 0, 22), UDim2.new(0, 10, 0, 78))
+	result.TextColor3 = Color3.fromRGB(255, 225, 120)
+
+	local function claim(rollId: string)
+		local outcome = onClaim(rollId)
+		if type(outcome) == "table" and outcome.ok then
+			local skin = Skins.Catalog[outcome.skinId]
+			result.Text = "Got " .. (skin and skin.name or outcome.skinId) .. (outcome.isNew and " — NEW!" or "")
+		elseif type(outcome) == "table" and outcome.reason == "NoFreeRolls" then
+			result.Text = "No free rolls left"
+		else
+			result.Text = "Try again"
+		end
+	end
+
+	local buttons = {}
+	for i, entry in ipairs(FREE_ROLLS) do
+		buttons[entry.id] = Widgets.button(
+			panel,
+			entry.label .. " x0",
+			UDim2.new(0, 170, 0, 34),
+			UDim2.new(0, 10 + (i - 1) * 180, 0, 40),
+			function()
+				claim(entry.id)
+			end
+		)
+	end
+
+	return function(freeRolls)
+		for _, entry in ipairs(FREE_ROLLS) do
+			local count = (freeRolls or {})[entry.id] or 0
+			buttons[entry.id].Text = entry.label .. " x" .. tostring(count)
+		end
+	end
+end
+
+function InventoryPanel.create(gui: ScreenGui, onEquip: (string) -> (), onClaim: (string) -> any, onOpened: () -> ())
+	local panel = Widgets.frame(gui, UDim2.new(0, 372, 0, 410), UDim2.new(0, 154, 0.5, 0), Vector2.new(0, 0.5))
 	panel.Visible = false
-	Widgets.label(panel, "Your X & O skins", UDim2.new(1, -20, 0, 28), UDim2.new(0, 10, 0, 8))
+	Widgets.label(panel, "Free rolls & your skins", UDim2.new(1, -20, 0, 26), UDim2.new(0, 10, 0, 8))
+
+	local refreshFreeRolls = buildFreeRolls(panel, onClaim)
 
 	local scroll = Instance.new("ScrollingFrame")
-	scroll.Size = UDim2.new(1, -16, 1, -48)
-	scroll.Position = UDim2.new(0, 8, 0, 42)
+	scroll.Size = UDim2.new(1, -16, 1, -116)
+	scroll.Position = UDim2.new(0, 8, 0, 108)
 	scroll.BackgroundTransparency = 1
 	scroll.BorderSizePixel = 0
 	scroll.ScrollBarThickness = 6
@@ -108,6 +145,7 @@ function InventoryPanel.create(gui: ScreenGui, onEquip: (string) -> (), onOpened
 	return {
 		update = function(profile)
 			lastProfile = profile
+			refreshFreeRolls(profile.freeRolls)
 			rebuild()
 		end,
 		close = function()
