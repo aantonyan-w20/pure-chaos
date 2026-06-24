@@ -20,9 +20,9 @@ Config.GameIslandDiameter = 40
 -- Furniture
 Config.TableSize = 6
 
--- The misere island (3 in a row LOSES there). Parked far past the fog so it
+-- The misere island (3 in a row LOSES there). Parked way past the fog so it
 -- can't be seen from the main island — you only reach it through the portal.
-Config.MysteryIslandPosition = Vector3.new(1200, 0, 0)
+Config.MysteryIslandPosition = Vector3.new(2500, 0, 0)
 
 -- Fixed seed so the park's trees and rocks land in the same spots every server
 Config.SceneSeed = 7
