@@ -105,7 +105,7 @@ local function buildMysteryIsland()
 	)
 end
 
-Environment.setup(worldFolder)
+Environment.setup()
 buildPlatform()
 buildMysteryIsland()
 

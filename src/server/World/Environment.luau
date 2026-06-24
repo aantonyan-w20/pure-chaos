@@ -1,17 +1,19 @@
 --[[
 	Environment
 	Sets the stage: clears the Studio template leftovers, dials in the
-	sky and fog, and lays the ocean so its surface sits just under the
-	platform and island tops (they rest on the water).
+	sky and fog, and fills a real Terrain-water sea around the island so
+	it clearly reads as water (gentle waves, no mirror reflection).
 ]]
 
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
-local PartBuilder = require(script.Parent.PartBuilder)
 
 local Environment = {}
+
+local WATER_EXTENT = 1200 -- how far the sea spreads out around the island
+local WATER_DEPTH = 30 -- deep enough to sit under the island's base
 
 local function clearTemplateLeftovers()
 	local baseplate = workspace:FindFirstChild("Baseplate")
@@ -39,23 +41,26 @@ local function setUpLighting()
 	Lighting.FogEnd = 650
 end
 
-local OCEAN_DEPTH = 60 -- thick slab so the platform's submerged sides sit in water
+local function makeOcean()
+	local terrain = workspace.Terrain
+	terrain:Clear()
 
-local function makeOcean(parent: Instance)
-	PartBuilder.make(parent, {
-		Name = "Ocean",
-		Size = Vector3.new(2048, OCEAN_DEPTH, 2048),
-		Position = Vector3.new(0, Config.WaterSurfaceY - OCEAN_DEPTH / 2, 0),
-		CanCollide = false,
-		Color = Config.Colors.Ocean,
-		Material = Enum.Material.SmoothPlastic,
-	}).Reflectance = 0.12
+	-- Real water look: visible blue, gentle waves, and no mirror reflection
+	terrain.WaterColor = Config.Colors.Ocean
+	terrain.WaterTransparency = 0.25
+	terrain.WaterReflectance = 0
+	terrain.WaterWaveSize = 0.15
+	terrain.WaterWaveSpeed = 12
+
+	local center = Vector3.new(0, Config.WaterSurfaceY - WATER_DEPTH / 2, 0)
+	local size = Vector3.new(WATER_EXTENT, WATER_DEPTH, WATER_EXTENT)
+	terrain:FillBlock(CFrame.new(center), size, Enum.Material.Water)
 end
 
-function Environment.setup(parent: Instance)
+function Environment.setup()
 	clearTemplateLeftovers()
 	setUpLighting()
-	makeOcean(parent)
+	makeOcean()
 end
 
 return Environment
