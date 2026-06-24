@@ -19,7 +19,12 @@ local EQUIP_COLOR = Color3.fromRGB(90, 220, 90)
 local CELL_COLOR = Color3.fromRGB(48, 52, 64)
 local TAB_ON = Color3.fromRGB(70, 110, 80)
 local TAB_OFF = Color3.fromRGB(55, 60, 75)
-local FREE_ROLLS = { { id = "mega", label = "Mega" }, { id = "lucky", label = "Lucky" } }
+local FREE_ROLLS = {
+	{ id = "mega", label = "Mega" },
+	{ id = "lucky", label = "Lucky" },
+	{ id = "chairBasic", label = "Chair" },
+	{ id = "chairElite", label = "Elite Chair" },
+}
 
 local function newCell(scroll: ScrollingFrame, index: number, equipped: boolean): TextButton
 	local cell = Instance.new("TextButton")
@@ -82,15 +87,16 @@ local function addChairCell(scroll, index, chairId, equipped, onEquip)
 end
 
 local function buildFreeRolls(panel: Frame, onClaim: (string) -> any): (table) -> ()
-	local result = Widgets.label(panel, "", UDim2.new(1, -20, 0, 22), UDim2.new(0, 10, 0, 78))
+	local result = Widgets.label(panel, "", UDim2.new(1, -20, 0, 22), UDim2.new(0, 10, 0, 118))
 	result.TextColor3 = Color3.fromRGB(255, 225, 120)
 
 	local function claim(rollId: string)
 		local outcome = onClaim(rollId)
 		if type(outcome) == "table" and outcome.ok then
-			local skin = Skins.Catalog[outcome.skinId]
+			local catalog = (outcome.kind == "chair") and ChairSkins.Catalog or Skins.Catalog
+			local entry = catalog[outcome.skinId]
 			local tag = outcome.isNew and " — NEW!" or (" (dupe, +" .. tostring(outcome.refund or 0) .. " Tacs)")
-			result.Text = "Got " .. (skin and skin.name or outcome.skinId) .. tag
+			result.Text = "Got " .. (entry and entry.name or outcome.skinId) .. tag
 		elseif type(outcome) == "table" and outcome.reason == "NoFreeRolls" then
 			result.Text = "No free rolls left"
 		else
@@ -98,9 +104,12 @@ local function buildFreeRolls(panel: Frame, onClaim: (string) -> any): (table) -
 		end
 	end
 
+	-- two columns, two rows (Mega/Lucky on top, the chair rolls below)
 	local buttons = {}
 	for i, entry in ipairs(FREE_ROLLS) do
-		buttons[entry.id] = Widgets.button(panel, entry.label .. " x0", UDim2.new(0, 170, 0, 34), UDim2.new(0, 10 + (i - 1) * 180, 0, 40), function()
+		local col = (i - 1) % 2
+		local row = math.floor((i - 1) / 2)
+		buttons[entry.id] = Widgets.button(panel, entry.label .. " x0", UDim2.new(0, 170, 0, 34), UDim2.new(0, 10 + col * 180, 0, 40 + row * 38), function()
 			claim(entry.id)
 		end)
 	end
@@ -113,15 +122,15 @@ local function buildFreeRolls(panel: Frame, onClaim: (string) -> any): (table) -
 end
 
 function InventoryPanel.create(gui: ScreenGui, onEquip: (string, string) -> (), onClaim: (string) -> any, onOpened: () -> ())
-	local panel = Widgets.frame(gui, UDim2.new(0, 372, 0, 430), UDim2.new(0, 154, 0.5, 0), Vector2.new(0, 0.5))
+	local panel = Widgets.frame(gui, UDim2.new(0, 372, 0, 470), UDim2.new(0, 154, 0.5, 0), Vector2.new(0, 0.5))
 	panel.Visible = false
 	Widgets.label(panel, "Free rolls & cosmetics", UDim2.new(1, -20, 0, 26), UDim2.new(0, 10, 0, 8))
 
 	local refreshFreeRolls = buildFreeRolls(panel, onClaim)
 
 	local scroll = Instance.new("ScrollingFrame")
-	scroll.Size = UDim2.new(1, -16, 1, -150)
-	scroll.Position = UDim2.new(0, 8, 0, 142)
+	scroll.Size = UDim2.new(1, -16, 1, -192)
+	scroll.Position = UDim2.new(0, 8, 0, 184)
 	scroll.BackgroundTransparency = 1
 	scroll.BorderSizePixel = 0
 	scroll.ScrollBarThickness = 6
@@ -164,12 +173,12 @@ function InventoryPanel.create(gui: ScreenGui, onEquip: (string, string) -> (), 
 		chairsTab.BackgroundColor3 = category == "chair" and TAB_ON or TAB_OFF
 	end
 
-	marksTab = Widgets.button(panel, "X / O", UDim2.new(0, 170, 0, 30), UDim2.new(0, 10, 0, 106), function()
+	marksTab = Widgets.button(panel, "X / O", UDim2.new(0, 170, 0, 30), UDim2.new(0, 10, 0, 148), function()
 		category = "mark"
 		refreshTabs()
 		rebuild()
 	end)
-	chairsTab = Widgets.button(panel, "Chairs", UDim2.new(0, 170, 0, 30), UDim2.new(0, 190, 0, 106), function()
+	chairsTab = Widgets.button(panel, "Chairs", UDim2.new(0, 170, 0, 30), UDim2.new(0, 190, 0, 148), function()
 		category = "chair"
 		refreshTabs()
 		rebuild()
