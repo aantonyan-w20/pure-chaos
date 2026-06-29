@@ -39,7 +39,7 @@ Config.SecretFreeRolls = { mega = 4, lucky = 4, chairBasic = 4, chairElite = 4 }
 
 -- Zeus's Throne shows the uploaded drawing as a standee. Paste the image's
 -- rbxassetid here; until then it falls back to the blocky throne build.
-Config.ZeusThroneDecalId = ""
+Config.ZeusThroneDecalId = "rbxassetid://120321761615086"
 
 -- Sandy stepped shore around the island so players who fall in can climb back up
 Config.BeachWidth = 16 -- how far the shore reaches out from the island edge
