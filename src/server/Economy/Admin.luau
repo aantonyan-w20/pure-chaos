@@ -1,11 +1,12 @@
 --[[
 	Admin
 	Developer perks. An admin (anyone testing in Studio, the experience
-	owner, or a UserId listed in Config.Admins) gets a big Tacs balance
-	on join so rolling is effectively free, plus two chat commands:
-	  /give <amount>   add Tacs (default 100000)
-	  /unlockall       unlock every X/O skin and chair
-	Regular players in the live game are unaffected.
+	owner, or a UserId listed in Config.Admins) gets a big Tacs balance on
+	join plus on-screen dev buttons (driven by the AdminPanel remote):
+	  Unlock All   unlock every X/O skin and chair
+	  +100k Tacs   add Tacs
+	Chat commands /give and /unlockall also work where the legacy chat is
+	enabled. Regular players in the live game are unaffected.
 ]]
 
 local Players = game:GetService("Players")
@@ -52,7 +53,15 @@ local function onChatted(player: Player, message: string)
 	end
 end
 
-local function setup(player: Player)
+local function runAction(player: Player, action: string)
+	if action == "unlockall" then
+		unlockAll(player)
+	elseif action == "give" then
+		PlayerData.addTacs(player, 100000)
+	end
+end
+
+local function setup(player: Player, panelRemote: RemoteEvent)
 	if not isAdmin(player) then
 		return
 	end
@@ -60,6 +69,7 @@ local function setup(player: Player)
 		if PlayerData.waitFor(player, 15) then
 			PlayerData.ensureTacs(player, Config.AdminTacs)
 		end
+		panelRemote:FireClient(player) -- tell the client to show the dev buttons
 	end)
 	player.Chatted:Connect(function(message)
 		onChatted(player, message)
@@ -67,9 +77,21 @@ local function setup(player: Player)
 end
 
 function Admin.start()
-	Players.PlayerAdded:Connect(setup)
+	local panelRemote = Instance.new("RemoteEvent")
+	panelRemote.Name = Config.EconomyRemotes.AdminPanel
+	panelRemote.Parent = ReplicatedStorage
+
+	panelRemote.OnServerEvent:Connect(function(player, action)
+		if isAdmin(player) and type(action) == "string" then
+			runAction(player, action)
+		end
+	end)
+
+	Players.PlayerAdded:Connect(function(player)
+		setup(player, panelRemote)
+	end)
 	for _, player in ipairs(Players:GetPlayers()) do
-		setup(player)
+		setup(player, panelRemote)
 	end
 end
 
