@@ -25,7 +25,9 @@ ChairSkins.Catalog = {
 	InvisibleChair = { order = 6, name = "Invisible Chair", transparency = 1 },
 	RainbowChair = { order = 7, name = "Rainbow Chair", animation = "rainbow" },
 	HumongousChair = { order = 8, name = "Humongous Chair", scale = 2.4 },
-	MythicChair = { order = 9, name = "Mythic Chair", color = Color3.fromRGB(235, 200, 90), decor = true },
+	-- Zeus's Throne (internally still keyed "MythicChair" so existing rolls/data
+	-- keep working): brown wooden throne with a teal panel, lightning, and storm.
+	MythicChair = { order = 9, name = "Zeus's Throne", color = Color3.fromRGB(110, 72, 42), scale = 1.2, decor = true },
 }
 
 local function symbolColor(symbol: string?): Color3
@@ -80,15 +82,16 @@ local function buildDecor(seat: Seat)
 		part.Parent = folder
 	end
 
-	for _, side in ipairs({ -1, 1 }) do
-		-- angel wings
-		deco(Vector3.new(0.2, 1.8, 2.6), base * CFrame.new(side * 1.3, 2.7, 0.9) * CFrame.Angles(0, 0, math.rad(side * 25)), Color3.new(1, 1, 1), Enum.Material.SmoothPlastic)
-		-- demon horns
-		deco(Vector3.new(0.9, 0.3, 0.3), base * CFrame.new(side * 0.5, 3.2, 0.85) * CFrame.Angles(0, 0, math.rad(90 - side * 25)), Color3.fromRGB(120, 20, 20), Enum.Material.SmoothPlastic, Enum.PartType.Cylinder)
+	-- teal back panel (the colored panel in the drawing)
+	deco(Vector3.new(1.4, 1.4, 0.12), base * CFrame.new(0, 1.6, 0.78), Color3.fromRGB(60, 170, 160), Enum.Material.SmoothPlastic)
+	-- yellow lightning bolts ringing the throne
+	for i = 1, 5 do
+		local angle = (i / 5) * math.pi * 2
+		deco(Vector3.new(0.18, 1.7, 0.18), base * CFrame.new(math.cos(angle) * 2.4, 1.4 + (i % 2) * 0.9, math.sin(angle) * 1.7) * CFrame.Angles(0, 0, math.rad(35)), Color3.fromRGB(255, 225, 60), Enum.Material.Neon)
 	end
-	local colors = { Color3.fromRGB(255, 90, 90), Color3.fromRGB(90, 160, 255), Color3.fromRGB(120, 255, 120), Color3.fromRGB(255, 230, 90) }
-	for i = 1, 4 do
-		deco(Vector3.new(0.6, 0.6, 0.6), base * CFrame.new(rng:NextNumber(-1.8, 1.8), 0.6 + i * 0.6, rng:NextNumber(-1, 1.5)), colors[i], Enum.Material.Neon, Enum.PartType.Ball)
+	-- blue storm streaks
+	for i = 1, 6 do
+		deco(Vector3.new(1.0, 0.1, 0.14), base * CFrame.new(rng:NextNumber(-2.4, 2.4), 0.6 + i * 0.5, rng:NextNumber(-1.5, 2)), Color3.fromRGB(120, 180, 235), Enum.Material.Neon)
 	end
 	folder.Parent = seat
 end
