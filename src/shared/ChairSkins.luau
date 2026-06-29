@@ -71,17 +71,18 @@ end
 
 -- A cartoon lightning bolt: a connected zigzag of neon-yellow segments
 -- starting at (x, y) in the chair's frame and stepping downward.
-local function lightningBolt(folder: Folder, base: CFrame, x: number, y: number)
+local function lightningBolt(folder: Folder, base: CFrame, x: number, y: number, scale: number?)
+	local s = scale or 1
 	local cx, cy = x, y
 	for _, deg in ipairs({ 35, -50, 40, -35 }) do
-		local length = 0.95
+		local length = 0.95 * s
 		local radians = math.rad(deg)
 		local dx, dy = math.sin(radians) * length, -math.cos(radians) * length
 		local seg = Instance.new("Part")
 		seg.Anchored, seg.CanCollide = true, false
 		seg.Material = Enum.Material.Neon
 		seg.Color = Color3.fromRGB(255, 230, 70)
-		seg.Size = Vector3.new(0.22, length, 0.22)
+		seg.Size = Vector3.new(0.22 * s, length, 0.22 * s)
 		seg.CFrame = base * CFrame.new(cx + dx / 2, cy + dy / 2, 0.9) * CFrame.Angles(0, 0, radians)
 		seg.Parent = folder
 		cx, cy = cx + dx, cy + dy
@@ -112,6 +113,8 @@ local function buildDecor(seat: Seat)
 	lightningBolt(folder, base, -1.8, cloudY - 1.4)
 	lightningBolt(folder, base, 1.6, cloudY - 1.0)
 	lightningBolt(folder, base, 0.1, cloudY - 1.8)
+	-- big lightning symbol crowning the very top
+	lightningBolt(folder, base, 0, cloudY + 5, 1.8)
 	folder.Parent = seat
 end
 
