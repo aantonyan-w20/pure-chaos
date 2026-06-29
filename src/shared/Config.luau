@@ -37,6 +37,10 @@ Config.PlatformThickness = 30 -- how deep the island block goes (its underside)
 -- The hidden red button under the island grants these free rolls (once).
 Config.SecretFreeRolls = { mega = 4, lucky = 4, chairBasic = 4, chairElite = 4 }
 
+-- Zeus's Throne shows the uploaded drawing as a standee. Paste the image's
+-- rbxassetid here; until then it falls back to the blocky throne build.
+Config.ZeusThroneDecalId = ""
+
 -- Sandy stepped shore around the island so players who fall in can climb back up
 Config.BeachWidth = 16 -- how far the shore reaches out from the island edge
 Config.BeachSteps = 6 -- terraces from the waterline up to the island top
