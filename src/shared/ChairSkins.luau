@@ -69,6 +69,25 @@ local function sizeLeg(leg: BasePart, scale: number)
 	leg.Size = Vector3.new(base.X * scale, base.Y, base.Z * scale) -- thicken in place, keep height
 end
 
+-- A cartoon lightning bolt: a connected zigzag of neon-yellow segments
+-- starting at (x, y) in the chair's frame and stepping downward.
+local function lightningBolt(folder: Folder, base: CFrame, x: number, y: number)
+	local cx, cy = x, y
+	for _, deg in ipairs({ 35, -50, 40, -35 }) do
+		local length = 0.95
+		local radians = math.rad(deg)
+		local dx, dy = math.sin(radians) * length, -math.cos(radians) * length
+		local seg = Instance.new("Part")
+		seg.Anchored, seg.CanCollide = true, false
+		seg.Material = Enum.Material.Neon
+		seg.Color = Color3.fromRGB(255, 230, 70)
+		seg.Size = Vector3.new(0.22, length, 0.22)
+		seg.CFrame = base * CFrame.new(cx + dx / 2, cy + dy / 2, 0.9) * CFrame.Angles(0, 0, radians)
+		seg.Parent = folder
+		cx, cy = cx + dx, cy + dy
+	end
+end
+
 local function buildDecor(seat: Seat)
 	local folder = Instance.new("Folder")
 	folder.Name = "ChairDecor"
@@ -89,10 +108,10 @@ local function buildDecor(seat: Seat)
 		local size = rng:NextNumber(1.6, 2.8)
 		deco(Vector3.new(size, size * 0.8, size), base * CFrame.new(rng:NextNumber(-2.4, 2.4), cloudY + rng:NextNumber(-0.4, 0.6), rng:NextNumber(-1, 1.5)), Color3.fromRGB(245, 248, 255), Enum.Material.SmoothPlastic, Enum.PartType.Ball)
 	end
-	-- little lightning bolts hanging from the cloud
-	for _ = 1, 3 do
-		deco(Vector3.new(0.18, 1.8, 0.18), base * CFrame.new(rng:NextNumber(-1.8, 1.8), cloudY - 2, rng:NextNumber(-0.8, 1.2)) * CFrame.Angles(0, 0, math.rad(20)), Color3.fromRGB(255, 225, 60), Enum.Material.Neon)
-	end
+	-- cartoon zigzag lightning bolts hanging from the cloud
+	lightningBolt(folder, base, -1.8, cloudY - 1.4)
+	lightningBolt(folder, base, 1.6, cloudY - 1.0)
+	lightningBolt(folder, base, 0.1, cloudY - 1.8)
 	folder.Parent = seat
 end
 
