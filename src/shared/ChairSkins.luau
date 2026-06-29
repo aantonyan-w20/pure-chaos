@@ -83,16 +83,15 @@ local function buildDecor(seat: Seat)
 		part.Parent = folder
 	end
 
-	-- teal back panel (the colored panel in the drawing)
-	deco(Vector3.new(1.4, 1.4, 0.12), base * CFrame.new(0, 1.6, 0.78), Color3.fromRGB(60, 170, 160), Enum.Material.SmoothPlastic)
-	-- yellow lightning bolts ringing the throne
-	for i = 1, 5 do
-		local angle = (i / 5) * math.pi * 2
-		deco(Vector3.new(0.18, 1.7, 0.18), base * CFrame.new(math.cos(angle) * 2.4, 1.4 + (i % 2) * 0.9, math.sin(angle) * 1.7) * CFrame.Angles(0, 0, math.rad(35)), Color3.fromRGB(255, 225, 60), Enum.Material.Neon)
+	-- a fluffy white cloud floating above the chair
+	local cloudY = 5.5
+	for _ = 1, 7 do
+		local size = rng:NextNumber(1.6, 2.8)
+		deco(Vector3.new(size, size * 0.8, size), base * CFrame.new(rng:NextNumber(-2.4, 2.4), cloudY + rng:NextNumber(-0.4, 0.6), rng:NextNumber(-1, 1.5)), Color3.fromRGB(245, 248, 255), Enum.Material.SmoothPlastic, Enum.PartType.Ball)
 	end
-	-- blue storm streaks
-	for i = 1, 6 do
-		deco(Vector3.new(1.0, 0.1, 0.14), base * CFrame.new(rng:NextNumber(-2.4, 2.4), 0.6 + i * 0.5, rng:NextNumber(-1.5, 2)), Color3.fromRGB(120, 180, 235), Enum.Material.Neon)
+	-- little lightning bolts hanging from the cloud
+	for _ = 1, 3 do
+		deco(Vector3.new(0.18, 1.8, 0.18), base * CFrame.new(rng:NextNumber(-1.8, 1.8), cloudY - 2, rng:NextNumber(-0.8, 1.2)) * CFrame.Angles(0, 0, math.rad(20)), Color3.fromRGB(255, 225, 60), Enum.Material.Neon)
 	end
 	folder.Parent = seat
 end
