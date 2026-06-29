@@ -26,8 +26,9 @@ ChairSkins.Catalog = {
 	RainbowChair = { order = 7, name = "Rainbow Chair", animation = "rainbow" },
 	HumongousChair = { order = 8, name = "Humongous Chair", scale = 2.4 },
 	-- Zeus's Throne (internally still keyed "MythicChair" so existing rolls/data
-	-- keep working): brown wooden throne with a teal panel, lightning, and storm.
-	MythicChair = { order = 9, name = "Zeus's Throne", color = Color3.fromRGB(110, 72, 42), scale = 1.2, decor = true },
+	-- keep working). With a decal id it shows the actual drawing as a standee;
+	-- without one it falls back to the blocky brown-throne build.
+	MythicChair = { order = 9, name = "Zeus's Throne", color = Color3.fromRGB(110, 72, 42), scale = 1.2, decor = true, image = Config.ZeusThroneDecalId },
 }
 
 local function symbolColor(symbol: string?): Color3
@@ -111,6 +112,33 @@ local function animate(seat: Seat, kind: string, token: number)
 	end)
 end
 
+-- Hides the real chair and stands up a flat standee showing the drawing,
+-- so the seat looks exactly like the uploaded image.
+local function buildImageChair(seat: Seat, imageId: string)
+	for _, part in ipairs(seat:GetChildren()) do
+		if part:IsA("BasePart") then
+			part.Transparency = 1
+		end
+	end
+	seat.Transparency = 1
+
+	local folder = Instance.new("Folder")
+	folder.Name = "ChairDecor"
+	local board = Instance.new("Part")
+	board.Anchored, board.CanCollide = true, false
+	board.Transparency = 1 -- only the decals show
+	board.Size = Vector3.new(5, 6, 0.2)
+	board.CFrame = seat.CFrame * CFrame.new(0, 2, 0.7)
+	board.Parent = folder
+	for _, face in ipairs({ Enum.NormalId.Front, Enum.NormalId.Back }) do
+		local decal = Instance.new("Decal")
+		decal.Texture = imageId
+		decal.Face = face
+		decal.Parent = board
+	end
+	folder.Parent = seat
+end
+
 -- Paints `skinId` onto the seat. Bumping the token stops any running
 -- animation from a previous skin, so this also serves as the reset.
 function ChairSkins.apply(seat: Seat, skinId: string)
@@ -120,6 +148,11 @@ function ChairSkins.apply(seat: Seat, skinId: string)
 	local decor = seat:FindFirstChild("ChairDecor")
 	if decor then
 		decor:Destroy()
+	end
+
+	if skin.image and skin.image ~= "" then
+		buildImageChair(seat, skin.image)
+		return
 	end
 
 	local symbol = seat:GetAttribute("Symbol")
