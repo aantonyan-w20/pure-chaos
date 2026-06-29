@@ -70,6 +70,7 @@ Config.EconomyRemotes = {
 	EquipSkin = "EquipSkin",
 	RequestRoll = "RequestRoll",
 	ClaimFreeRoll = "ClaimFreeRoll", -- redeem a free roll earned from the secret button
+	AdminPanel = "AdminPanel", -- developer-only "unlock all" / "give Tacs" buttons
 }
 
 Config.Colors = {

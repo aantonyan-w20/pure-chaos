@@ -14,6 +14,7 @@ local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Co
 local TacsBox = require(script.Parent.Ui.TacsBox)
 local InventoryPanel = require(script.Parent.Ui.InventoryPanel)
 local RollShop = require(script.Parent.Ui.RollShop)
+local DevPanel = require(script.Parent.Ui.DevPanel)
 
 local player = Players.LocalPlayer
 
@@ -23,6 +24,7 @@ local getProfile = ReplicatedStorage:WaitForChild(names.GetProfile)
 local equipEvent = ReplicatedStorage:WaitForChild(names.EquipSkin)
 local rollFunction = ReplicatedStorage:WaitForChild(names.RequestRoll)
 local claimFreeRoll = ReplicatedStorage:WaitForChild(names.ClaimFreeRoll)
+local adminPanel = ReplicatedStorage:WaitForChild(names.AdminPanel)
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "Hud"
@@ -30,6 +32,14 @@ gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local tacsBox = TacsBox.create(gui)
+
+-- Dev buttons appear only after the server confirms this player is an admin
+local devPanel = DevPanel.create(gui, function(action)
+	adminPanel:FireServer(action)
+end)
+adminPanel.OnClientEvent:Connect(function()
+	devPanel.show()
+end)
 
 local inventory, shop
 inventory = InventoryPanel.create(gui, function(kind, id)
